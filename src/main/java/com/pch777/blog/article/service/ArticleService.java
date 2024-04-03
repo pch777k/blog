@@ -2,6 +2,7 @@ package com.pch777.blog.article.service;
 
 import com.pch777.blog.article.domain.model.Article;
 import com.pch777.blog.article.domain.repository.ArticleRepository;
+import com.pch777.blog.article.dto.ArticleDto;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,8 +16,10 @@ import java.util.UUID;
 public class ArticleService {
 
     private final ArticleRepository articleRepository;
+    private final ArticleMapper articleMapper;
+
     @Transactional(readOnly = true)
-    public Article getArticle(UUID id) {
+    public Article getArticleById(UUID id) {
         return articleRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Article not found with id: " + id));
     }
@@ -27,20 +30,19 @@ public class ArticleService {
     }
 
     @Transactional
-    public Article createArticle(Article articleRequest) {
-        Article article = new Article();
-        article.setTitle(articleRequest.getTitle());
-        article.setContent(articleRequest.getContent());
+    public Article createArticle(ArticleDto articleDto) {
+        Article article = articleMapper.map(articleDto);
         return articleRepository.save(article);
     }
 
     @Transactional
-    public Article updateArticle(UUID id, Article articleRequest) {
+    public Article updateArticle(UUID id, ArticleDto articleDto) {
         Article article = articleRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Article not found with id: " + id));
-        article.setTitle(articleRequest.getTitle());
-        article.setContent(articleRequest.getContent());
-        return articleRepository.save(article);
+        Article updatedArticle = articleMapper.map(articleDto);
+        updatedArticle.setId(article.getId());
+        updatedArticle.setCreated(article.getCreated());
+        return articleRepository.save(updatedArticle);
     }
 
     @Transactional

@@ -1,6 +1,7 @@
 package com.pch777.blog.article.controller;
 
 import com.pch777.blog.article.domain.model.Article;
+import com.pch777.blog.article.dto.ArticleDto;
 import com.pch777.blog.article.service.ArticleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,19 +24,19 @@ public class ArticleApiController {
 
     @GetMapping("{id}")
     public Article getArticle(@PathVariable UUID id) {
-        return articleService.getArticle(id);
+        return articleService.getArticleById(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Article createArticle(@RequestBody Article article) {
-        return articleService.createArticle(article);
+    public Article createArticle(@RequestBody ArticleDto articleDto) {
+        return articleService.createArticle(articleDto);
     }
 
     @PutMapping("{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public Article updateArticle(@PathVariable UUID id, @RequestBody Article article) {
-        return articleService.updateArticle(id, article);
+    public Article updateArticle(@PathVariable UUID id, @RequestBody ArticleDto articleDto) {
+        return articleService.updateArticle(id, articleDto);
     }
 
     @DeleteMapping("{id}")

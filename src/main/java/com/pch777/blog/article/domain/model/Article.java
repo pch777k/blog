@@ -1,5 +1,7 @@
 package com.pch777.blog.article.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.pch777.blog.category.domain.model.Category;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -20,13 +22,14 @@ public class Article {
     @Id
     private UUID id;
 
-    @NotBlank
-    @Size(min = 3, max = 60)
     private String title;
 
     @JdbcTypeCode(SqlTypes.LONGVARCHAR)
-    @NotBlank
     private String content;
+
+    @JsonBackReference
+    @ManyToOne
+    private Category category;
 
     private LocalDateTime created;
 
