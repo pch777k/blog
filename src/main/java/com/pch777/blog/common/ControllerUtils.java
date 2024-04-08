@@ -10,11 +10,14 @@ public abstract class ControllerUtils {
 
     public static void paging(Model model, Page page) {
         int totalPages = page.getTotalPages();
+        int currentPageNumber = page.getNumber();
         if(totalPages > 0) {
             List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages)
                     .boxed()
                     .toList();
             model.addAttribute("pageNumbers", pageNumbers);
         }
+        model.addAttribute("currentPageNumber", currentPageNumber);
+        model.addAttribute("totalPagesNumber", totalPages);
     }
 }

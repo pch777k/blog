@@ -4,7 +4,7 @@ $(document).ready(function () {
         let likesElement = $('#likesCount-' + articleId);
         $.ajax({
             type: "POST",
-            url: "api/v1/articles/" + articleId + "/like",
+            url: "/api/v1/articles/" + articleId + "/like",
             success: function () {
                 let currentLikes = parseInt(likesElement.text());
                 likesElement.text(currentLikes + 1);

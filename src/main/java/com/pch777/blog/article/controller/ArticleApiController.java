@@ -1,12 +1,10 @@
 package com.pch777.blog.article.controller;
 
 import com.pch777.blog.article.domain.model.Article;
-import com.pch777.blog.article.domain.model.ArticleStats;
 import com.pch777.blog.article.dto.ArticleDto;
 import com.pch777.blog.article.service.ArticleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

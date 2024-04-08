@@ -6,23 +6,18 @@
 
 <th:block th:replace="~{template :: header(categories = ${categories})}"/>
 <main class="container">
-    <th:block th:replace="~{template :: article-top}"/>
+<!--    <th:block th:replace="~{template :: article-top}"/>-->
     <div class="row g-5">
         <div class="col-md-8">
-            <!--            <h3 class="pb-4 mb-4 fst-italic border-bottom">-->
-            <!--                From the Firehose-->
-            <!--            </h3>-->
+                        <h3 th:text="${categoryName}" class="pb-2 mb-4 fst-italic border-bottom">
+                            category name
+                        </h3>
             <div class="row">
                 <div th:each="article : ${summaryArticlesPage}" class="col-md-6 d-flex align-items-stretch">
                     <div class="card shadow-sm mb-4" style="width:30rem;">
                         <img th:src="@{${article.imageUrl}}" class="card-img-top " height="200" alt="...">
                         <div class="card-body">
-                            <strong>
-                            <a th:href="@{'/categories/' + ${article.categoryId}}"
-                               class="d-inline-block mb-2 text-success-emphasis"
-                               th:text="${article.categoryName}"
-                               >Category</a>
-                            </strong>
+                            <strong th:text="${article.categoryName}" class="d-inline-block mb-2 text-success-emphasis">Category</strong>
                             <h5 th:text="${article.title}" class="mb-0">Post title</h5>
                             <span class="mb-1 text-body-secondary" th:text="${#temporals.format(article.created, 'MMM dd, yyyy')} + ' · ' + ${article.timeToRead} + ' min read'">created · time to read</span>
                             <p th:text="${article.shortContent}" class="card-text">Article content</p>
@@ -38,13 +33,6 @@
                                             th:attr="data-article-id=${article.id}">Like
                                     </button>
 
-                                    <!--                                    <button class="btn btn-sm btn-outline-secondary" id="likeButton" th:attr="data-article-id=${article.id}">Like</button>-->
-                                    <!--                                    <a th:href="@{'/articles/'+ ${article.id} +'/edit'}" class="btn btn-sm btn-outline-secondary">-->
-                                    <!--                                        <i class="fas fa-pencil-alt"></i> Edit-->
-                                    <!--                                    </a>-->
-                                    <!--                                    <a th:href="@{'/articles/'+ ${article.id} +'/delete'}" class="btn btn-sm btn-outline-secondary">-->
-                                    <!--                                        <i class="fas fa-trash">  </i>  Delete-->
-                                    <!--                                    </a>-->
                                 </div>
                             </div>
                         </div>
@@ -72,22 +60,17 @@
 
                 </div>
             </div>
-<!--            <div class="card-footer clearfix mb-2">-->
-<!--                <ul class="pagination pagination-sm m-0 float-right"-->
-<!--                    th:if="${summaryArticlesPage.totalPages > 0}">-->
-<!--                    <li th:each="pageNumber : ${pageNumbers}" class="page-item">-->
-<!--                        <a class="page-link"-->
-<!--                           th:href="@{'/articles'(s=${search}, field=${field},-->
-<!--                           direction=${direction}, size=${summaryArticlesPage.size}, page=${pageNumber}-1)}"-->
-<!--                           th:text="${pageNumber}"></a>-->
-<!--                    </li>-->
-<!--                </ul>-->
-<!--            </div>-->
 
-            <div th:replace="~{template :: pagination-articles(href='/articles',
-            currentPage=${currentPageNumber},
-            totalPages=${totalPagesNumber},
-            search=${search})}"></div>
+
+                <th:block th:replace="~{template :: pagination-articles(href='/categories/' + ${activeCategoryId},
+                    currentPage=${currentPageNumber},
+                    totalPages=${totalPagesNumber},
+                    search=${search})}">
+                </th:block>
+
+
+
+
 
         </div>
 

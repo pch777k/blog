@@ -44,25 +44,23 @@ public class ArticleService {
     }
 
     @Transactional(readOnly = true)
-    public List<SummaryArticleDto> getSummaryArticles() {
-        return articleRepository.findAll()
-                .stream()
-                .map(articleMapper::mapToSummaryArticleDto)
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public Page<SummaryArticleDto> getSummaryArticles(Pageable pageable) {
-        return getSummaryArticles(null, pageable);
+    public Page<SummaryArticleDto> getSummaryArticles(UUID categoryId, String search, Pageable pageable) {
+        Page<Article> articlesPage;
+        if (search == null || search.isBlank()) {
+            articlesPage = articleRepository.findByCategoryId(categoryId, pageable);
+        } else {
+            articlesPage = articleRepository.findByCategoryIdAndTitleContainingIgnoreCase(categoryId, search.trim(), pageable);
+        }
+        return articlesPage.map(articleMapper::mapToSummaryArticleDto);
     }
 
     @Transactional(readOnly = true)
     public Page<SummaryArticleDto> getSummaryArticles(String search, Pageable pageable) {
         Page<Article> articlesPage;
-        if (search == null) {
+        if (search == null || search.isBlank()) {
             articlesPage = articleRepository.findAll(pageable);
         } else {
-            articlesPage = articleRepository.findByTitleContainingIgnoreCase(search, pageable);
+            articlesPage = articleRepository.findByTitleContainingIgnoreCase(search.trim(), pageable);
         }
         return articlesPage.map(articleMapper::mapToSummaryArticleDto);
     }

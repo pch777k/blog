@@ -14,4 +14,8 @@ public interface ArticleRepository extends JpaRepository<Article, UUID> {
    Optional<Article> findByTitleUrl(String titleUrl);
 
    Page<Article> findByTitleContainingIgnoreCase(String title, Pageable pageable);
+
+   Page<Article> findByCategoryId(UUID id, Pageable pageable);
+
+   Page<Article> findByCategoryIdAndTitleContainingIgnoreCase(UUID id, String title, Pageable pageable);
 }

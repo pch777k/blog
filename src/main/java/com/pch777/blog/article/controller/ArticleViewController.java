@@ -37,6 +37,8 @@ public class ArticleViewController extends BlogCommonViewController {
     private final ArticleStatsService articleStatsService;
     private final ArticleMapper articleMapper;
 
+
+
     public ArticleViewController(CategoryService categoryService,
                                  ArticleService articleService,
                                  ArticleStatsService articleStatsService,
@@ -55,8 +57,8 @@ public class ArticleViewController extends BlogCommonViewController {
     @GetMapping
     public String indexView(
             @RequestParam(name = "s", required = false) String search,
-            @RequestParam(name = "field", required = false, defaultValue = "id") String field,
-            @RequestParam(name = "direction", required = false, defaultValue = "asc") String direction,
+            @RequestParam(name = "field", required = false, defaultValue = "created") String field,
+            @RequestParam(name = "direction", required = false, defaultValue = "desc") String direction,
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
             @RequestParam(name = "size", required = false, defaultValue = "2") int size,
             Model model
@@ -78,9 +80,6 @@ public class ArticleViewController extends BlogCommonViewController {
         model.addAttribute("direction", direction);
         model.addAttribute("reverseSort", reverseSort);
 
-        model.addAttribute("currentPageNumber", summaryArticlesPage.getNumber());
-        model.addAttribute("totalPagesNumber", summaryArticlesPage.getTotalPages());
-
         addGlobalAttributes(model);
 
         paging(model, summaryArticlesPage);
@@ -94,6 +93,7 @@ public class ArticleViewController extends BlogCommonViewController {
         ArticleStats articleStats = articleStatsService.getArticleStatsByArticleId(article.getId());
         model.addAttribute("article", article);
         model.addAttribute("articleStats", articleStats);
+        addGlobalAttributes(model);
 
         return "article/single";
     }
