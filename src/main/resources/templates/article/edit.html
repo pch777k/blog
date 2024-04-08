@@ -24,6 +24,14 @@
                 <small><span class="text text-danger" th:if="${#fields.hasErrors('content')}"
                              th:errors="*{content}"></span></small>
             </div>
+
+            <div class="mb-3">
+                <label for="image-url" class="form-label">Image url</label>
+                <input th:field="*{imageUrl}" class="form-control" id="image-url">
+                <small><span class="text text-danger" th:if="${#fields.hasErrors('imageUrl')}"
+                             th:errors="*{imageUrl}"></span></small>
+            </div>
+
             <div class="mb-3">
                 <select class="form-select" th:field="*{categoryId}" aria-label="select category">
                     <option th:each="category : ${categories}"

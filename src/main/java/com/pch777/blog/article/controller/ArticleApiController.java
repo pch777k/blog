@@ -1,10 +1,12 @@
 package com.pch777.blog.article.controller;
 
 import com.pch777.blog.article.domain.model.Article;
+import com.pch777.blog.article.domain.model.ArticleStats;
 import com.pch777.blog.article.dto.ArticleDto;
 import com.pch777.blog.article.service.ArticleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,9 +24,14 @@ public class ArticleApiController {
         return articleService.getArticles();
     }
 
-    @GetMapping("{id}")
-    public Article getArticle(@PathVariable UUID id) {
-        return articleService.getArticleById(id);
+//    @GetMapping("{id}")
+//    public Article getArticle(@PathVariable UUID id) {
+//        return articleService.getArticleById(id);
+//    }
+
+    @GetMapping("{titleUrl}")
+    public Article getArticle(@PathVariable String titleUrl) {
+        return articleService.getArticleByTitleUrl(titleUrl);
     }
 
     @PostMapping
@@ -43,5 +50,11 @@ public class ArticleApiController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteArticle(@PathVariable UUID id) {
         articleService.deleteArticle(id);
+    }
+
+    @PostMapping("{id}/like")
+    @ResponseStatus(HttpStatus.OK)
+    public void like(@PathVariable UUID id) {
+        articleService.increaseLikes(id);
     }
 }

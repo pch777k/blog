@@ -3,20 +3,18 @@ package com.pch777.blog.category.service;
 import com.pch777.blog.category.domain.model.Category;
 import com.pch777.blog.category.domain.repository.CategoryRepository;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
 
+@RequiredArgsConstructor
 @Service
 public class CategoryService {
 
     private final CategoryRepository categoryRepository;
-
-    public CategoryService(CategoryRepository categoryRepository) {
-        this.categoryRepository = categoryRepository;
-    }
 
     @Transactional(readOnly = true)
     public List<Category> getCategories() {

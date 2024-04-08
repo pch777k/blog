@@ -1,18 +1,29 @@
 package com.pch777.blog.article.controller;
 
+import com.pch777.blog.article.domain.model.Article;
+import com.pch777.blog.article.domain.model.ArticleStats;
 import com.pch777.blog.article.dto.ArticleDto;
+import com.pch777.blog.article.dto.SummaryArticleDto;
 import com.pch777.blog.article.service.ArticleMapper;
 import com.pch777.blog.article.service.ArticleService;
+import com.pch777.blog.article.service.ArticleStatsService;
 import com.pch777.blog.category.service.CategoryService;
 import com.pch777.blog.common.BlogCommonViewController;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+
 import java.util.UUID;
+
+import static com.pch777.blog.common.ControllerUtils.paging;
 
 @Controller
 @RequestMapping("/articles")
@@ -21,14 +32,18 @@ public class ArticleViewController extends BlogCommonViewController {
     public static final String ARTICLE_ADD = "article/add";
     public static final String ARTICLE_EDIT = "article/edit";
     public static final String REDIRECT_ARTICLES = "redirect:/articles";
+
     private final ArticleService articleService;
+    private final ArticleStatsService articleStatsService;
     private final ArticleMapper articleMapper;
 
     public ArticleViewController(CategoryService categoryService,
                                  ArticleService articleService,
+                                 ArticleStatsService articleStatsService,
                                  ArticleMapper articleMapper) {
         super(categoryService);
         this.articleService = articleService;
+        this.articleStatsService = articleStatsService;
         this.articleMapper = articleMapper;
     }
 
@@ -38,15 +53,48 @@ public class ArticleViewController extends BlogCommonViewController {
     }
 
     @GetMapping
-    public String indexView(Model model) {
-        model.addAttribute("articles", articleService.getArticles());
+    public String indexView(
+            @RequestParam(name = "s", required = false) String search,
+            @RequestParam(name = "field", required = false, defaultValue = "id") String field,
+            @RequestParam(name = "direction", required = false, defaultValue = "asc") String direction,
+            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+            @RequestParam(name = "size", required = false, defaultValue = "2") int size,
+            Model model
+    ) {
+
+        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(direction), field);
+
+        String reverseSort = null;
+        if ("asc".equals(direction)) {
+            reverseSort = "desc";
+        } else {
+            reverseSort = "asc";
+        }
+
+        Page<SummaryArticleDto> summaryArticlesPage =  articleService.getSummaryArticles(search, pageable);
+        model.addAttribute("summaryArticlesPage", summaryArticlesPage);
+        model.addAttribute("search", search);
+        model.addAttribute("field", field);
+        model.addAttribute("direction", direction);
+        model.addAttribute("reverseSort", reverseSort);
+
+        model.addAttribute("currentPageNumber", summaryArticlesPage.getNumber());
+        model.addAttribute("totalPagesNumber", summaryArticlesPage.getTotalPages());
+
         addGlobalAttributes(model);
+
+        paging(model, summaryArticlesPage);
+
         return "article/index";
     }
 
-    @GetMapping("{id}")
-    public String singleView(Model model, @PathVariable UUID id) {
-        model.addAttribute("article", articleService.getArticleById(id));
+    @GetMapping("{titleUrl}")
+    public String singleView(Model model, @PathVariable String titleUrl) {
+        Article article = articleService.getArticleByTitleUrl(titleUrl);
+        ArticleStats articleStats = articleStatsService.getArticleStatsByArticleId(article.getId());
+        model.addAttribute("article", article);
+        model.addAttribute("articleStats", articleStats);
+
         return "article/single";
     }
 
@@ -54,7 +102,6 @@ public class ArticleViewController extends BlogCommonViewController {
     public String addView(Model model) {
         model.addAttribute("articleDto", new ArticleDto());
         addGlobalAttributes(model);
-
         return ARTICLE_ADD;
     }
 
@@ -121,6 +168,14 @@ public class ArticleViewController extends BlogCommonViewController {
     @GetMapping("{id}/delete")
     public String delete(@PathVariable UUID id) {
         articleService.deleteArticle(id);
+        return REDIRECT_ARTICLES;
+    }
+
+    @PostMapping("{id}/like")
+    public String like(@PathVariable UUID id, Model model) {
+        articleService.increaseLikes(id);
+        model.addAttribute("articles", articleService.getArticles());
+        addGlobalAttributes(model);
         return REDIRECT_ARTICLES;
     }
 

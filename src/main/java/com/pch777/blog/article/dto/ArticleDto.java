@@ -16,7 +16,8 @@ public class ArticleDto {
     @NotBlank
     private String content;
 
-    private UUID categoryId;
+    @NotBlank
+    private String imageUrl;
 
-    //private String categoryName;
+    private UUID categoryId;
 }

@@ -9,42 +9,56 @@
     <th:block th:replace="~{template :: article-top}"/>
     <div class="row g-5">
         <div class="col-md-8">
-            <h3 class="pb-4 mb-4 fst-italic border-bottom">
-                From the Firehose
-            </h3>
+            <!--            <h3 class="pb-4 mb-4 fst-italic border-bottom">-->
+            <!--                From the Firehose-->
+            <!--            </h3>-->
             <div class="row">
-                <div th:each="article : ${articles}" class="col-md-6">
+                <div th:each="article : ${summaryArticlesPage}" class="col-md-6 d-flex align-items-stretch">
                     <div class="card shadow-sm mb-4">
-                        <svg class="bd-placeholder-img card-img-top" width="100%" height="225"
-                             xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Placeholder: Thumbnail"
-                             preserveAspectRatio="xMidYMid slice" focusable="false"><title>Placeholder</title>
-                            <rect width="100%" height="100%" fill="#55595c"/>
-                            <text x="50%" y="50%" fill="#eceeef" dy=".3em">Thumbnail</text>
-                        </svg>
+                        <img th:src="@{${article.imageUrl}}" class="card-img-top " height="200" alt="...">
                         <div class="card-body">
-                            <strong th:text="${article.category.name}" class="d-inline-block mb-2 text-success-emphasis">Category</strong>
-                            <h3 th:text="${article.title}" class="mb-0">Post title</h3>
-                            <div th:text="${#temporals.format(article.created, 'dd/MM/YYYY')}" class="mb-1 text-body-secondary">Nov 11</div>
-                            <p th:text="${#strings.abbreviate(article.content,95)}" class="card-text">Article content</p>
+                            <strong th:text="${article.categoryName}" class="d-inline-block mb-2 text-success-emphasis">Category</strong>
+                            <h5 th:text="${article.title}" class="mb-0">Post title</h5>
+                            <span class="mb-1 text-body-secondary" th:text="${#temporals.format(article.created, 'MMM dd, yyyy')} + ' · ' + ${article.timeToRead} + ' min read'">created · time to read</span>
+                            <p th:text="${article.shortContent}" class="card-text">Article content</p>
+
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="btn-group">
-                                    <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary">Edit</button>
-                                    <button type="button" class="btn btn-sm btn-outline-secondary">Delete</button>
+                                    <a th:href="@{'/articles/'+ ${article.titleUrl}}"
+                                       class="btn btn-sm btn-outline-secondary">
+                                        <i class="fas fa-folder"></i> View
+                                    </a>
+
+                                    <button class="likeButton btn btn-sm btn-outline-secondary"
+                                            th:attr="data-article-id=${article.id}">Like
+                                    </button>
+
+                                    <!--                                    <button class="btn btn-sm btn-outline-secondary" id="likeButton" th:attr="data-article-id=${article.id}">Like</button>-->
+                                    <!--                                    <a th:href="@{'/articles/'+ ${article.id} +'/edit'}" class="btn btn-sm btn-outline-secondary">-->
+                                    <!--                                        <i class="fas fa-pencil-alt"></i> Edit-->
+                                    <!--                                    </a>-->
+                                    <!--                                    <a th:href="@{'/articles/'+ ${article.id} +'/delete'}" class="btn btn-sm btn-outline-secondary">-->
+                                    <!--                                        <i class="fas fa-trash">  </i>  Delete-->
+                                    <!--                                    </a>-->
                                 </div>
-                                <small class="text-body-secondary">9 mins</small>
                             </div>
                         </div>
                         <div class="card-footer text-center">
                             <div class="row align-items-start">
                                 <div class="col">
-                                    <small class="text-body-secondary"><i class="bi bi-heart-fill"></i> 3</small>
+                                    <small class="text-body-secondary">
+                                        <i class="bi bi-hand-thumbs-up-fill"></i>
+                                        <span th:id="'likesCount-' + ${article.id}" th:text="${article.likes}">0</span>
+                                    </small>
                                 </div>
                                 <div class="col">
                                     <small class="text-body-secondary"><i class="bi bi-chat-fill"></i> 5</small>
                                 </div>
                                 <div class="col">
-                                    <small class="text-body-secondary"><i class="bi bi-eye-fill"></i> 9</small>
+                                    <small class="text-body-secondary">
+                                        <i class="bi bi-eye-fill"></i>
+                                        <span th:text="${article.views}">0</span>
+                                    </small>
                                 </div>
                             </div>
 
@@ -53,20 +67,39 @@
 
                 </div>
             </div>
-
-
-
-
+            <div class="card-footer clearfix">
+                <ul class="pagination pagination-sm m-0 float-right"
+                    th:if="${summaryArticlesPage.totalPages > 0}">
+                    <li th:each="pageNumber : ${pageNumbers}" class="page-item">
+                        <a class="page-link"
+                           th:href="@{'/articles'(s=${search}, field=${field},
+                           direction=${direction}, size=${summaryArticlesPage.size}, page=${pageNumber}-1)}"
+                           th:text="${pageNumber}"></a>
+                    </li>
+                </ul>
+            </div>
 
             <nav class="blog-pagination" aria-label="Pagination">
                 <a class="btn btn-outline-primary rounded-pill" href="#">Older</a>
                 <a class="btn btn-outline-secondary rounded-pill disabled" aria-disabled="true">Newer</a>
             </nav>
 
+
+            <div th:replace="~{template :: pagination-articles(href='/articles',
+            currentPage=${currentPageNumber},
+            totalPages=${totalPagesNumber})}"></div>
+
         </div>
 
         <div class="col-md-4">
+            <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
+                <div class="input-group">
+                    <input name="s" th:value="${search}" type="search" class="form-control" placeholder="Search..." aria-label="Search">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </form>
             <div class="position-sticky" style="top: 2rem;">
+
                 <div class="p-4 mb-3 bg-body-tertiary rounded">
                     <h4 class="fst-italic">About</h4>
                     <p class="mb-0">Customize this section to tell your visitors a little bit about your publication,
@@ -79,11 +112,7 @@
                         <li>
                             <a class="d-flex flex-column flex-lg-row gap-3 align-items-start align-items-lg-center py-3 link-body-emphasis text-decoration-none border-top"
                                href="#">
-                                <svg class="bd-placeholder-img" width="100%" height="96"
-                                     xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
-                                     preserveAspectRatio="xMidYMid slice" focusable="false">
-                                    <rect width="100%" height="100%" fill="#777"/>
-                                </svg>
+                                <img src="https://picsum.photos/id/199/120/120" class="card-img-top" alt="...">
                                 <div class="col-lg-8">
                                     <h6 class="mb-0">Example blog post title</h6>
                                     <small class="text-body-secondary">January 15, 2024</small>
@@ -93,11 +122,7 @@
                         <li>
                             <a class="d-flex flex-column flex-lg-row gap-3 align-items-start align-items-lg-center py-3 link-body-emphasis text-decoration-none border-top"
                                href="#">
-                                <svg class="bd-placeholder-img" width="100%" height="96"
-                                     xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
-                                     preserveAspectRatio="xMidYMid slice" focusable="false">
-                                    <rect width="100%" height="100%" fill="#777"/>
-                                </svg>
+                                <img src="https://picsum.photos/id/399/120/120" class="card-img-top" alt="...">
                                 <div class="col-lg-8">
                                     <h6 class="mb-0">This is another blog post title</h6>
                                     <small class="text-body-secondary">January 14, 2024</small>
@@ -107,11 +132,7 @@
                         <li>
                             <a class="d-flex flex-column flex-lg-row gap-3 align-items-start align-items-lg-center py-3 link-body-emphasis text-decoration-none border-top"
                                href="#">
-                                <svg class="bd-placeholder-img" width="100%" height="96"
-                                     xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
-                                     preserveAspectRatio="xMidYMid slice" focusable="false">
-                                    <rect width="100%" height="100%" fill="#777"/>
-                                </svg>
+                                <img src="https://picsum.photos/id/299/120/120" class="card-img-top" alt="...">
                                 <div class="col-lg-8">
                                     <h6 class="mb-0">Longer blog post title: This one has multiple lines!</h6>
                                     <small class="text-body-secondary">January 13, 2024</small>
@@ -153,50 +174,13 @@
 
 </main>
 
-    <div class="container text-center">
-        <div class="row">
-            <h1>Articles</h1>
-
-            <table class="table">
-                <thead>
-                <tr>
-                    <th scope="col">Title</th>
-                    <th scope="col">Content</th>
-                    <th scope="col">Created</th>
-                    <th scope="col">Modified</th>
-                    <th scope="col">Category</th>
-                    <th scope="col">Action</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="article : ${articles}">
-                    <td th:text="${article.title}">title</td>
-                    <td th:text="${article.content}">content</td>
-                    <td th:text="${#temporals.format(article.created, 'dd-MM-yyyy HH:mm')}">created</td>
-                    <td th:text="${#temporals.format(article.modified, 'dd-MM-yyyy HH:mm')}">modified</td>
-                    <td th:text="${article.category.name}">category</td>
-                    <td>
-                        <a th:href="@{'/articles/'+ ${article.id}}" class="btn btn-primary btn-sm">
-                            <i class="fas fa-folder"></i> View
-                        </a>
-                        <a th:href="@{'/articles/'+ ${article.id} +'/edit'}" class="btn btn-info btn-sm">
-                            <i class="fas fa-pencil-alt"></i> Edit
-                        </a>
-                        <a th:href="@{'/articles/'+ ${article.id} +'/delete'}" class="btn btn-danger btn-sm">
-                            <i class="fas fa-trash">  </i>  Delete
-                        </a>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
 <th:block th:replace="~{template :: footer}"/>
+
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
         crossorigin="anonymous"></script>
+
 </body>
 </html>
 
