@@ -1,7 +1,9 @@
 package com.pch777.blog.article.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.pch777.blog.category.domain.model.Category;
+import com.pch777.blog.tag.domain.model.Tag;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +11,8 @@ import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -33,6 +37,10 @@ public class Article {
 
     @Column(name = "time_to_read")
     private int timeToRead;
+
+    @ManyToMany(mappedBy = "articles", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JsonIgnoreProperties("articles")
+    private Set<Tag> tags = new HashSet<>();
 
     @JsonBackReference
     @ManyToOne
@@ -98,6 +106,22 @@ public class Article {
         String fullContent = this.title + " " + this.content;
         String[] words = fullContent.split("\\s+");
         return words.length;
+    }
+
+    public void addTag(Tag tag) {
+        tags.add(tag);
+        tag.getArticles().add(this);
+    }
+
+    public void removeTag(Tag tag) {
+        tags.remove(tag);
+        tag.getArticles().remove(this);
+    }
+
+    public void removeTags() {
+        Article self = this;
+        tags.forEach(tag -> tag.getArticles().remove(self));
+        tags.clear();
     }
 
 }

@@ -6,25 +6,28 @@
 
 <th:block th:replace="~{template :: header(categories = ${categories})}"/>
 <main class="container">
-    <th:block th:replace="~{template :: article-top}"/>
+    <!--    <th:block th:replace="~{template :: article-top}"/>-->
     <div class="row g-5">
         <div class="col-md-8">
-            <!--            <h3 class="pb-4 mb-4 fst-italic border-bottom">-->
-            <!--                From the Firehose-->
-            <!--            </h3>-->
+            <h3 class="pb-2 mb-4 fst-italic border-bottom">
+                <a th:href="@{'/tags/'+ ${tagId}}">
+                    # <span th:text="${tagName}">tag name</span>
+                </a>
+            </h3>
             <div th:replace="~{template :: articles-display(articles = ${summaryArticlesPage})}"></div>
 
-            <div th:replace="~{template :: pagination-articles(href='/articles',
-            currentPage=${currentPageNumber},
-            totalPages=${totalPagesNumber},
-            search=${search})}"></div>
-
+            <th:block th:replace="~{template :: pagination-articles(href='/tags/' + ${tagId},
+                    currentPage=${currentPageNumber},
+                    totalPages=${totalPagesNumber},
+                    search=${search})}">
+            </th:block>
         </div>
 
         <div class="col-md-4">
             <form class="col-12 col-lg-auto mb-3" role="search">
                 <div class="input-group">
-                    <input name="s" th:value="${search}" type="search" class="form-control" placeholder="Search..." aria-label="Search">
+                    <input name="s" th:value="${search}" type="search" class="form-control" placeholder="Search..."
+                           aria-label="Search">
                     <button type="submit" class="btn btn-secondary">Search</button>
                 </div>
             </form>

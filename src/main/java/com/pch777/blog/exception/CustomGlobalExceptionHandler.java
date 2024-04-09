@@ -1,5 +1,6 @@
 package com.pch777.blog.exception;
 
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
@@ -35,13 +36,39 @@ public class CustomGlobalExceptionHandler {
         return new ResponseEntity<>(body, status);
     }
 
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex) {
+    @ExceptionHandler({EntityNotFoundException.class, EntityExistsException.class})
+    public ResponseEntity<Object> handleEntityException(Exception ex) {
         Map<String, Object> body = new LinkedHashMap<>();
-        HttpStatus status = HttpStatus.NOT_FOUND;
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        if (ex instanceof EntityNotFoundException) {
+            status = HttpStatus.NOT_FOUND;
+        } else if (ex instanceof EntityExistsException) {
+            status = HttpStatus.CONFLICT;
+        }
         body.put(TIMESTAMP, new Date());
-        body.put(STATUS, status.value());
+        body.put(STATUS, status);
         body.put(ERROR, ex.getMessage());
         return new ResponseEntity<>(body, status);
     }
+//    @ExceptionHandler(EntityNotFoundException.class)
+//    public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex) {
+//        Map<String, Object> body = new LinkedHashMap<>();
+//        HttpStatus status = HttpStatus.NOT_FOUND;
+//        body.put(TIMESTAMP, new Date());
+//        body.put(STATUS, status.value());
+//        body.put(ERROR, ex.getMessage());
+//        return new ResponseEntity<>(body, status);
+//    }
+//
+//    @ExceptionHandler(EntityExistsException.class)
+//    public ResponseEntity<Object> handleEntityNotFoundException(EntityExistsException ex) {
+//        Map<String, Object> body = new LinkedHashMap<>();
+//        HttpStatus status = HttpStatus.CONFLICT;
+//        body.put(TIMESTAMP, new Date());
+//        body.put(STATUS, status.value());
+//        body.put(ERROR, ex.getMessage());
+//        return new ResponseEntity<>(body, status);
+//    }
+
+
 }

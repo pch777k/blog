@@ -6,70 +6,19 @@
 
 <th:block th:replace="~{template :: header(categories = ${categories})}"/>
 <main class="container">
-<!--    <th:block th:replace="~{template :: article-top}"/>-->
+    <!--    <th:block th:replace="~{template :: article-top}"/>-->
     <div class="row g-5">
         <div class="col-md-8">
-                        <h3 th:text="${categoryName}" class="pb-2 mb-4 fst-italic border-bottom">
-                            category name
-                        </h3>
-            <div class="row">
-                <div th:each="article : ${summaryArticlesPage}" class="col-md-6 d-flex align-items-stretch">
-                    <div class="card shadow-sm mb-4" style="width:30rem;">
-                        <img th:src="@{${article.imageUrl}}" class="card-img-top " height="200" alt="...">
-                        <div class="card-body">
-                            <strong th:text="${article.categoryName}" class="d-inline-block mb-2 text-success-emphasis">Category</strong>
-                            <h5 th:text="${article.title}" class="mb-0">Post title</h5>
-                            <span class="mb-1 text-body-secondary" th:text="${#temporals.format(article.created, 'MMM dd, yyyy')} + ' · ' + ${article.timeToRead} + ' min read'">created · time to read</span>
-                            <p th:text="${article.shortContent}" class="card-text">Article content</p>
+            <h3 th:text="${categoryName}" class="pb-2 mb-4 fst-italic border-bottom">
+                category name
+            </h3>
+            <div th:replace="~{template :: articles-display(articles = ${summaryArticlesPage})}"></div>
 
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div class="btn-group">
-                                    <a th:href="@{'/articles/'+ ${article.titleUrl}}"
-                                       class="btn btn-sm btn-outline-secondary">
-                                        <i class="fas fa-folder"></i> View
-                                    </a>
-
-                                    <button class="likeButton btn btn-sm btn-outline-secondary"
-                                            th:attr="data-article-id=${article.id}">Like
-                                    </button>
-
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-footer text-center">
-                            <div class="row align-items-start">
-                                <div class="col">
-                                    <small class="text-body-secondary">
-                                        <i class="bi bi-hand-thumbs-up-fill"></i>
-                                        <span th:id="'likesCount-' + ${article.id}" th:text="${article.likes}">0</span>
-                                    </small>
-                                </div>
-                                <div class="col">
-                                    <small class="text-body-secondary"><i class="bi bi-chat-fill"></i> 5</small>
-                                </div>
-                                <div class="col">
-                                    <small class="text-body-secondary">
-                                        <i class="bi bi-eye-fill"></i>
-                                        <span th:text="${article.views}">0</span>
-                                    </small>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-
-                <th:block th:replace="~{template :: pagination-articles(href='/categories/' + ${activeCategoryId},
+            <th:block th:replace="~{template :: pagination-articles(href='/categories/' + ${activeCategoryId},
                     currentPage=${currentPageNumber},
                     totalPages=${totalPagesNumber},
                     search=${search})}">
-                </th:block>
-
-
-
+            </th:block>
 
 
         </div>
@@ -77,7 +26,8 @@
         <div class="col-md-4">
             <form class="col-12 col-lg-auto mb-3" role="search">
                 <div class="input-group">
-                    <input name="s" th:value="${search}" type="search" class="form-control" placeholder="Search..." aria-label="Search">
+                    <input name="s" th:value="${search}" type="search" class="form-control" placeholder="Search..."
+                           aria-label="Search">
                     <button type="submit" class="btn btn-secondary">Search</button>
                 </div>
             </form>

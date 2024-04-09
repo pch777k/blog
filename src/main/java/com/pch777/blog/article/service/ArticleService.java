@@ -44,6 +44,17 @@ public class ArticleService {
     }
 
     @Transactional(readOnly = true)
+    public Page<SummaryArticleDto> getSummaryArticlesByTagId(UUID tagId, String search, Pageable pageable) {
+        Page<Article> articlesPage;
+        if (search == null || search.isBlank()) {
+            articlesPage = articleRepository.findByTagsId(tagId, pageable);
+        } else {
+            articlesPage = articleRepository.findByTagsIdAndTitleContainingIgnoreCase(tagId, search.trim(), pageable);
+        }
+        return articlesPage.map(articleMapper::mapToSummaryArticleDto);
+    }
+
+    @Transactional(readOnly = true)
     public Page<SummaryArticleDto> getSummaryArticles(UUID categoryId, String search, Pageable pageable) {
         Page<Article> articlesPage;
         if (search == null || search.isBlank()) {

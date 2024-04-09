@@ -185,6 +185,49 @@ values  (gen_random_uuid(),  5, 10, (select id from articles where image_url = '
         (gen_random_uuid(),  3, 11, (select id from articles where image_url = 'https://picsum.photos/id/94/300/200')),
         (gen_random_uuid(), 17, 38, (select id from articles where image_url = 'https://picsum.photos/id/99/300/200'));
 
+insert into tags (id, name)
+values (gen_random_uuid(), 'asia'),
+       (gen_random_uuid(), 'adventure'),
+       (gen_random_uuid(), 'music'),
+       (gen_random_uuid(), 'film'),
+       (gen_random_uuid(), 'literature'),
+       (gen_random_uuid(), 'finance'),
+       (gen_random_uuid(), 'economy'),
+       (gen_random_uuid(), 'government'),
+       (gen_random_uuid(), 'democracy'),
+       (gen_random_uuid(), 'fitness'),
+       (gen_random_uuid(), 'tourism'),
+       (gen_random_uuid(), 'destination');
+
+insert into tags_articles (articles_id, tags_id)
+values  ((select id from articles where image_url = 'https://picsum.photos/id/14/300/200'),
+         (select id from tags where name = 'asia')),
+        ((select id from articles where image_url = 'https://picsum.photos/id/14/300/200'),
+         (select id from tags where name = 'adventure')),
+        ((select id from articles where image_url = 'https://picsum.photos/id/24/300/200'),
+         (select id from tags where name = 'adventure')),
+        ((select id from articles where image_url = 'https://picsum.photos/id/24/300/200'),
+         (select id from tags where name = 'destination')),
+        ((select id from articles where image_url = 'https://picsum.photos/id/24/300/200'),
+         (select id from tags where name = 'tourism')),
+        ((select id from articles where image_url = 'https://picsum.photos/id/34/300/200'),
+         (select id from tags where name = 'fitness')),
+        ((select id from articles where image_url = 'https://picsum.photos/id/44/300/200'),
+         (select id from tags where name = 'democracy')),
+        ((select id from articles where image_url = 'https://picsum.photos/id/54/300/200'),
+         (select id from tags where name = 'economy')),
+        ((select id from articles where image_url = 'https://picsum.photos/id/64/300/200'),
+         (select id from tags where name = 'government')),
+        ((select id from articles where image_url = 'https://picsum.photos/id/74/300/200'),
+         (select id from tags where name = 'literature')),
+        ((select id from articles where image_url = 'https://picsum.photos/id/84/300/200'),
+         (select id from tags where name = 'music')),
+        ((select id from articles where image_url = 'https://picsum.photos/id/94/300/200'),
+         (select id from tags where name = 'film')),
+        ((select id from articles where image_url = 'https://picsum.photos/id/94/300/200'),
+         (select id from tags where name = 'adventure')),
+        ((select id from articles where image_url = 'https://picsum.photos/id/99/300/200'),
+         (select id from tags where name = 'music'));
 
 update articles
 set title_url = CONCAT(REPLACE(LOWER(CONCAT(title, '-', RIGHT(id::text, 6))), ' ', '-'));
