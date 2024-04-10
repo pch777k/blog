@@ -56,6 +56,12 @@ public class ArticleService {
     }
 
     @Transactional(readOnly = true)
+    public Page<SummaryArticleDto> getSummaryArticles(Pageable pageable) {
+        Page<Article> articlesPage = articleRepository.findAll(pageable);
+        return articlesPage.map(articleMapper::mapToSummaryArticleDto);
+    }
+
+    @Transactional(readOnly = true)
     public Page<SummaryArticleDto> getSummaryArticles(String search, Pageable pageable) {
         Page<Article> articlesPage;
         if (search == null || search.isBlank()) {

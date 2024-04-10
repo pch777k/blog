@@ -37,7 +37,6 @@ public class TagViewController extends BlogCommonViewController {
 
     @GetMapping("{id}")
     public String indexView(@PathVariable UUID id,
-            @RequestParam(name = "s", required = false) String search,
             @RequestParam(name = "field", required = false, defaultValue = "created") String field,
             @RequestParam(name = "direction", required = false, defaultValue = "desc") String direction,
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,

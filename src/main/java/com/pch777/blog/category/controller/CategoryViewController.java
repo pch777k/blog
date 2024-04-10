@@ -32,7 +32,6 @@ public class CategoryViewController extends BlogCommonViewController {
 
     @GetMapping("{id}")
     public String indexView(@PathVariable UUID id,
-            @RequestParam(name = "s", required = false) String search,
             @RequestParam(name = "field", required = false, defaultValue = "created") String field,
             @RequestParam(name = "direction", required = false, defaultValue = "desc") String direction,
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
@@ -51,7 +50,6 @@ public class CategoryViewController extends BlogCommonViewController {
 
         Page<SummaryArticleDto> summaryArticlesPage =  articleService.getSummaryArticlesByCategoryId(id, pageable);
         model.addAttribute("summaryArticlesPage", summaryArticlesPage);
-        model.addAttribute("search", search);
         model.addAttribute("field", field);
         model.addAttribute("direction", direction);
         model.addAttribute("reverseSort", reverseSort);

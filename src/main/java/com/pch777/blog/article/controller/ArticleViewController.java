@@ -37,8 +37,6 @@ public class ArticleViewController extends BlogCommonViewController {
     private final ArticleStatsService articleStatsService;
     private final ArticleMapper articleMapper;
 
-
-
     public ArticleViewController(CategoryService categoryService,
                                  ArticleService articleService,
                                  ArticleStatsService articleStatsService,
@@ -56,7 +54,6 @@ public class ArticleViewController extends BlogCommonViewController {
 
     @GetMapping
     public String indexView(
-            @RequestParam(name = "s", required = false) String search,
             @RequestParam(name = "field", required = false, defaultValue = "created") String field,
             @RequestParam(name = "direction", required = false, defaultValue = "desc") String direction,
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
@@ -73,9 +70,8 @@ public class ArticleViewController extends BlogCommonViewController {
             reverseSort = "asc";
         }
 
-        Page<SummaryArticleDto> summaryArticlesPage =  articleService.getSummaryArticles(search, pageable);
+        Page<SummaryArticleDto> summaryArticlesPage =  articleService.getSummaryArticles(pageable);
         model.addAttribute("summaryArticlesPage", summaryArticlesPage);
-        model.addAttribute("search", search);
         model.addAttribute("field", field);
         model.addAttribute("direction", direction);
         model.addAttribute("reverseSort", reverseSort);
