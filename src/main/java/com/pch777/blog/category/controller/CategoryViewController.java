@@ -49,7 +49,7 @@ public class CategoryViewController extends BlogCommonViewController {
             reverseSort = "asc";
         }
 
-        Page<SummaryArticleDto> summaryArticlesPage =  articleService.getSummaryArticles(id, search, pageable);
+        Page<SummaryArticleDto> summaryArticlesPage =  articleService.getSummaryArticlesByCategoryId(id, pageable);
         model.addAttribute("summaryArticlesPage", summaryArticlesPage);
         model.addAttribute("search", search);
         model.addAttribute("field", field);

@@ -25,13 +25,12 @@ public class ArticleMapper {
     private final CategoryService categoryService;
     private final TagService tagService;
 
-    public Article map(ArticleDto articleDto) {
-        Article article = new Article();
+    public Article mapToArticle(Article article, ArticleDto articleDto) {
         Category category = categoryService.getCategoryById(articleDto.getCategoryId());
-
         article.setTitle(articleDto.getTitle());
         article.setContent(articleDto.getContent());
         article.setImageUrl(articleDto.getImageUrl());
+        article.setCategory(category);
 
         List<TagDto> tagDtoList = articleDto.getTagDtoList();
         if (!tagDtoList.isEmpty()) {
@@ -47,11 +46,10 @@ public class ArticleMapper {
                 }
             }
         }
-        article.setCategory(category);
         return article;
     }
 
-    public ArticleDto map(Article article) {
+    public ArticleDto mapToArticleDto(Article article) {
         ArticleDto articleDto = new ArticleDto();
         articleDto.setTitle(article.getTitle());
         articleDto.setContent(article.getContent());

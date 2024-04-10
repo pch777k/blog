@@ -133,7 +133,7 @@ public class ArticleViewController extends BlogCommonViewController {
 
     @GetMapping("{id}/edit")
     public String editView(Model model, @PathVariable UUID id) {
-        ArticleDto articleDto = articleMapper.map(articleService.getArticleById(id));
+        ArticleDto articleDto = articleMapper.mapToArticleDto(articleService.getArticleById(id));
         model.addAttribute("articleDto", articleDto);
         model.addAttribute("id", id);
         addGlobalAttributes(model);
@@ -159,7 +159,6 @@ public class ArticleViewController extends BlogCommonViewController {
             articleService.updateArticle(id, articleDto);
             //redirectAttributes.addFlashAttribute("message", Message.info("Article edited"));
         } catch (Exception e) {
-            e.printStackTrace();
             model.addAttribute("message", "Unknown during article edition");
             addGlobalAttributes(model);
             return ARTICLE_EDIT;

@@ -12,6 +12,7 @@ import java.util.UUID;
 public class ArticleStats {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     private int views;
@@ -21,7 +22,6 @@ public class ArticleStats {
     private Article article;
 
     public ArticleStats() {
-        this.id = UUID.randomUUID();
         this.views = 0;
         this.likes = 0;
     }

@@ -6,25 +6,29 @@
 
 <th:block th:replace="~{template :: header(categories = ${categories})}"/>
 <main class="container">
-    <!--    <th:block th:replace="~{template :: article-top}"/>-->
+<!--    <th:block th:replace="~{template :: article-top}"/>-->
     <div class="row g-5">
         <div class="col-md-8">
-            <h3 th:text="${categoryName}" class="pb-2 mb-4 fst-italic border-bottom">
-                category name
+            <h3 class="pb-4 mb-4 fst-italic border-bottom">
+                Search: '<span th:text="${search}"></span>' - <span th:text="${summaryArticlesPage.totalElements}"></span> results found
             </h3>
             <div th:replace="~{template :: articles-display(articles = ${summaryArticlesPage})}"></div>
 
-            <th:block th:replace="~{template :: pagination-articles(href='/categories/' + ${activeCategoryId},
-                    currentPage=${currentPageNumber},
-                    totalPages=${totalPagesNumber},
-                    search=${search})}">
-            </th:block>
-
+            <div th:replace="~{template :: pagination-articles(href='/search',
+            currentPage=${currentPageNumber},
+            totalPages=${totalPagesNumber},
+            search=${search})}"></div>
 
         </div>
 
         <div class="col-md-4">
-            <form th:replace="~{template :: search-form(search = ${search})}"></form>
+            <form class="col-12 col-lg-auto mb-3" role="search">
+                <div class="input-group">
+                    <input name="s" th:value="${search}" type="search" class="form-control" placeholder="Search..."
+                           aria-label="Search" required>
+                    <button type="submit" class="btn btn-secondary">Search</button>
+                </div>
+            </form>
             <div class="position-sticky" style="top: 2rem;">
 
                 <div class="p-4 mb-3 bg-body-tertiary rounded">

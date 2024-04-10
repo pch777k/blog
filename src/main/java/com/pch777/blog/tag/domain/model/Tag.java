@@ -4,18 +4,21 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.pch777.blog.article.domain.model.Article;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+@NoArgsConstructor
 @Getter
 @Setter
 @Entity(name = "tags")
 public class Tag {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(unique = true)
@@ -25,10 +28,6 @@ public class Tag {
     @JoinTable
     @JsonIgnoreProperties("tags")
     private Set<Article> articles = new HashSet<>();
-
-    public Tag() {
-        this.id = UUID.randomUUID();
-    }
 
     public void addArticle(Article article) {
         articles.add(article);
