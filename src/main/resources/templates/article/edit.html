@@ -10,8 +10,9 @@
 <div class="container text-center">
     <div class="row">
         <h1>Edit article</h1>
-
-        <form th:object="${articleDto}" method="post">
+        <span class="text text-danger" th:if="${message != null}"
+              th:text="${message}"></span>
+        <form th:object="${articleDto}" method="post"  th:action="@{'/articles/' + ${id} + '/edit'}">
             <div class="mb-3">
                 <label for="title" class="form-label">Title</label>
                 <input th:field="*{title}" type="text" class="form-control" id="title" placeholder="title">
@@ -30,6 +31,38 @@
                 <input th:field="*{imageUrl}" class="form-control" id="image-url">
                 <small><span class="text text-danger" th:if="${#fields.hasErrors('imageUrl')}"
                              th:errors="*{imageUrl}"></span></small>
+            </div>
+            <div class = "row">
+                <div class="col-auto mb-3">
+                    <label for="tag1" class="form-label">Tag 1</label>
+                    <input th:field="*{tagDtoList[0].name}" class="form-control" id="tag1" placeholder="#tag">
+                    <small><span class="text text-danger" th:if="${#fields.hasErrors('tagDtoList[0].name')}"
+                                 th:errors="*{tagDtoList[0].name}"></span></small>
+                </div>
+                <div class="col-auto mb-3">
+                    <label for="tag2" class="form-label">Tag 2</label>
+                    <input th:field="*{tagDtoList[1].name}" class="form-control" id="tag2" placeholder="#tag">
+                    <small><span class="text text-danger" th:if="${#fields.hasErrors('tagDtoList[1].name')}"
+                                 th:errors="*{tagDtoList[1].name}"></span></small>
+                </div>
+                <div class="col-auto mb-3">
+                    <label for="tag3" class="form-label">Tag 3</label>
+                    <input th:field="*{tagDtoList[2].name}" class="form-control" id="tag3" placeholder="#tag">
+                    <small><span class="text text-danger" th:if="${#fields.hasErrors('tagDtoList[2].name')}"
+                                 th:errors="*{tagDtoList[2].name}"></span></small>
+                </div>
+                <div class="col-auto mb-3">
+                    <label for="tag4" class="form-label">Tag 4</label>
+                    <input th:field="*{tagDtoList[3].name}" class="form-control" id="tag4" placeholder="#tag">
+                    <small><span class="text text-danger" th:if="${#fields.hasErrors('tagDtoList[3].name')}"
+                                 th:errors="*{tagDtoList[3].name}"></span></small>
+                </div>
+                <div class="col-auto mb-3">
+                    <label for="tag5" class="form-label">Tag 5</label>
+                    <input th:field="*{tagDtoList[4].name}" class="form-control" id="tag5" placeholder="#tag">
+                    <small><span class="text text-danger" th:if="${#fields.hasErrors('tagDtoList[4].name')}"
+                                 th:errors="*{tagDtoList[4].name}"></span></small>
+                </div>
             </div>
 
             <div class="mb-3">

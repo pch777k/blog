@@ -6,6 +6,7 @@ import com.pch777.blog.category.domain.model.Category;
 import com.pch777.blog.tag.domain.model.Tag;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
@@ -15,6 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+@NoArgsConstructor
 @Getter
 @Setter
 @Entity
@@ -22,6 +24,7 @@ import java.util.UUID;
 public class Article {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     private String title;
@@ -49,10 +52,6 @@ public class Article {
     private LocalDateTime created;
 
     private LocalDateTime modified;
-
-    public Article() {
-        this.id = UUID.randomUUID();
-    }
 
     public Article(String title, String content) {
         this();

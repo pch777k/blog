@@ -45,6 +45,17 @@ public class TagService {
         return tagRepository.save(tag);
     }
 
+//    @Transactional
+//    public void createTags(List<TagDto> tagDtoList) {
+//        for(TagDto tagDto : tagDtoList) {
+//            if (!isTagExists(tagDto.getName())) {
+//                Tag tag = new Tag();
+//                tag.setName(tagDto.getName());
+//                tagRepository.save(tag);
+//            }
+//        }
+//    }
+
     @Transactional
     public Tag updateTag(UUID id, TagDto tagDto) {
         Tag tag = tagRepository.findById(id)
@@ -61,7 +72,7 @@ public class TagService {
         tagRepository.delete(tag);
     }
 
-    private boolean isTagExists(String name) {
+    public boolean isTagExists(String name) {
         return tagRepository.existsByName(name);
     }
 }

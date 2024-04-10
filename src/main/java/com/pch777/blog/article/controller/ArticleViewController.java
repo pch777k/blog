@@ -123,6 +123,7 @@ public class ArticleViewController extends BlogCommonViewController {
             //redirectAttributes.addFlashAttribute("message", "Article created");
         } catch (Exception e) {
             model.addAttribute("message", "Unknown error during article creation");
+            e.printStackTrace();
             addGlobalAttributes(model);
             return ARTICLE_ADD;
         }
@@ -134,6 +135,7 @@ public class ArticleViewController extends BlogCommonViewController {
     public String editView(Model model, @PathVariable UUID id) {
         ArticleDto articleDto = articleMapper.map(articleService.getArticleById(id));
         model.addAttribute("articleDto", articleDto);
+        model.addAttribute("id", id);
         addGlobalAttributes(model);
 
         return ARTICLE_EDIT;
@@ -157,6 +159,7 @@ public class ArticleViewController extends BlogCommonViewController {
             articleService.updateArticle(id, articleDto);
             //redirectAttributes.addFlashAttribute("message", Message.info("Article edited"));
         } catch (Exception e) {
+            e.printStackTrace();
             model.addAttribute("message", "Unknown during article edition");
             addGlobalAttributes(model);
             return ARTICLE_EDIT;

@@ -1,13 +1,11 @@
 package com.pch777.blog.tag.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
 public class TagDto {
 
-    @NotBlank
-    @Size(min = 3, max = 20)
+    @Pattern(regexp = "^$|^.{3,20}$", message = "Length must be between 3 and 20 characters")
     private String name;
 }

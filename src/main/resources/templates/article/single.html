@@ -27,7 +27,7 @@
                                   th:text="${#temporals.format(article.created, 'MMM dd, yyyy')} + ' · ' + ${article.timeToRead} + ' min read'">created · time to read</span>
                             </small>
                                 <p th:text="${article.content}" class="card-text">Article content</p>
-                            <div class="pt-3 mb-2">
+                            <div th:unless="${article.tags.isEmpty()}" class="pt-3 mb-2">
                                 tags: <span th:each="tag, it : ${article.tags}">
                                          #<a th:href="@{'/tags/'+ ${tag.id}}" th:text="${tag.name}"></a>
                                         <span th:if="${!it.last}">, </span>
@@ -181,6 +181,8 @@
     </div>
 
 </main>
+
+
 
 <th:block th:replace="~{template :: footer}"/>
 

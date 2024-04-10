@@ -6,9 +6,14 @@ import com.pch777.blog.article.dto.ArticleDto;
 import com.pch777.blog.article.dto.SummaryArticleDto;
 import com.pch777.blog.category.domain.model.Category;
 import com.pch777.blog.category.service.CategoryService;
+import com.pch777.blog.tag.domain.model.Tag;
+import com.pch777.blog.tag.dto.TagDto;
+import com.pch777.blog.tag.service.TagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Component
@@ -16,8 +21,9 @@ public class ArticleMapper {
 
     @Value("${article.shortContent.maxlength}")
     private int maxShortContentLength;
-    private final CategoryService categoryService;
     private final ArticleStatsService articleStatsService;
+    private final CategoryService categoryService;
+    private final TagService tagService;
 
     public Article map(ArticleDto articleDto) {
         Article article = new Article();
@@ -26,8 +32,22 @@ public class ArticleMapper {
         article.setTitle(articleDto.getTitle());
         article.setContent(articleDto.getContent());
         article.setImageUrl(articleDto.getImageUrl());
-        article.setCategory(category);
 
+        List<TagDto> tagDtoList = articleDto.getTagDtoList();
+        if (!tagDtoList.isEmpty()) {
+            for (TagDto tagDto : tagDtoList) {
+                if(!tagDto.getName().isBlank()) {
+                    Tag tag;
+                    if (!tagService.isTagExists(tagDto.getName())) {
+                        tag = tagService.createTag(tagDto);
+                    } else {
+                        tag = tagService.getTagByName(tagDto.getName());
+                    }
+                    article.addTag(tag);
+                }
+            }
+        }
+        article.setCategory(category);
         return article;
     }
 
@@ -36,6 +56,13 @@ public class ArticleMapper {
         articleDto.setTitle(article.getTitle());
         articleDto.setContent(article.getContent());
         articleDto.setImageUrl(article.getImageUrl());
+        if(!article.getTags().isEmpty()) {
+            for (Tag tag : article.getTags()) {
+                TagDto tagDto = new TagDto();
+                tagDto.setName(tag.getName());
+                articleDto.getTagDtoList().add(tagDto);
+            }
+        }
         articleDto.setCategoryId(article.getCategory().getId());
 
         return articleDto;
