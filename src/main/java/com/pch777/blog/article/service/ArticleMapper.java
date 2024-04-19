@@ -3,9 +3,11 @@ package com.pch777.blog.article.service;
 import com.pch777.blog.article.domain.model.Article;
 import com.pch777.blog.article.domain.model.ArticleStats;
 import com.pch777.blog.article.dto.ArticleDto;
+import com.pch777.blog.article.dto.ShortArticleDto;
 import com.pch777.blog.article.dto.SummaryArticleDto;
 import com.pch777.blog.category.domain.model.Category;
 import com.pch777.blog.category.service.CategoryService;
+import com.pch777.blog.comment.service.CommentService;
 import com.pch777.blog.tag.domain.model.Tag;
 import com.pch777.blog.tag.dto.TagDto;
 import com.pch777.blog.tag.service.TagService;
@@ -13,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -24,6 +27,7 @@ public class ArticleMapper {
     private final ArticleStatsService articleStatsService;
     private final CategoryService categoryService;
     private final TagService tagService;
+    private final CommentService commentService;
 
     public Article mapToArticle(Article article, ArticleDto articleDto) {
         Category category = categoryService.getCategoryById(articleDto.getCategoryId());
@@ -31,11 +35,11 @@ public class ArticleMapper {
         article.setContent(articleDto.getContent());
         article.setImageUrl(articleDto.getImageUrl());
         article.setCategory(category);
-
+        article.removeTags();
         List<TagDto> tagDtoList = articleDto.getTagDtoList();
         if (!tagDtoList.isEmpty()) {
             for (TagDto tagDto : tagDtoList) {
-                if(!tagDto.getName().isBlank()) {
+                if (!tagDto.getName().isBlank()) {
                     Tag tag;
                     if (!tagService.isTagExists(tagDto.getName())) {
                         tag = tagService.createTag(tagDto);
@@ -50,29 +54,33 @@ public class ArticleMapper {
     }
 
     public ArticleDto mapToArticleDto(Article article) {
-        ArticleDto articleDto = new ArticleDto();
-        articleDto.setTitle(article.getTitle());
-        articleDto.setContent(article.getContent());
-        articleDto.setImageUrl(article.getImageUrl());
-        if(!article.getTags().isEmpty()) {
+        List<TagDto> tagDtoList = new ArrayList<>();
+        if (!article.getTags().isEmpty()) {
             for (Tag tag : article.getTags()) {
                 TagDto tagDto = new TagDto();
                 tagDto.setName(tag.getName());
-                articleDto.getTagDtoList().add(tagDto);
+                tagDtoList.add(tagDto);
             }
         }
-        articleDto.setCategoryId(article.getCategory().getId());
-
-        return articleDto;
+        return ArticleDto.builder()
+                .title(article.getTitle())
+                .content(article.getContent())
+                .imageUrl(article.getImageUrl())
+                .categoryId(article.getCategory().getId())
+                .tagDtoList(tagDtoList)
+                .build();
     }
 
     public SummaryArticleDto mapToSummaryArticleDto(Article article) {
         ArticleStats articleStats = articleStatsService.getArticleStatsByArticleId(article.getId());
+        String shortContent = shortenContent(article.getContent(), maxShortContentLength);
+        int totalComments = commentService.getComments(article.getId()).size();
+
         return SummaryArticleDto.builder()
                 .id(article.getId())
                 .title(article.getTitle())
                 .titleUrl(article.getTitleUrl())
-                .shortContent(shortenContent(article.getContent(), maxShortContentLength))
+                .shortContent(shortContent)
                 .imageUrl(article.getImageUrl())
                 .categoryId(article.getCategory().getId())
                 .categoryName(article.getCategory().getName())
@@ -80,7 +88,16 @@ public class ArticleMapper {
                 .timeToRead(article.getTimeToRead())
                 .likes(articleStats.getLikes())
                 .views(articleStats.getViews())
+                .totalComments(totalComments)
                 .build();
+    }
+
+    public ShortArticleDto mapToShortArticleDto(Article article) {
+        return ShortArticleDto.builder()
+                .title(article.getTitle())
+                .titleUrl(article.getTitleUrl())
+                .imageUrl(article.getImageUrl())
+                .created(article.getCreated()).build();
     }
 
     private String shortenContent(String content, int maxLength) {

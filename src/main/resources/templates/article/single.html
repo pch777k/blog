@@ -6,45 +6,40 @@
 
 <th:block th:replace="~{template :: header(categories = ${categories})}"/>
 <main class="container">
-    <!--    <th:block th:replace="~{template :: article-top}"/>-->
-    <div class="row g-5">
+    <div class="row">
         <div class="col-md-8">
-            <!--            <h3 class="pb-4 mb-4 fst-italic border-bottom">-->
-            <!--                From the Firehose-->
-            <!--            </h3>-->
+            <div th:if="${message != null}"  class="alert alert-success" role="alert">
+                <i class="bi bi-check-circle"> </i><span th:text="${message.content}">Article created/edited successfully!</span>
+            </div>
+
             <div class="row">
                 <div class="col-md-12">
                     <div class="card shadow-sm mb-4">
-
-                        <img th:src="@{${article.imageUrl}}" class="card-img-top" alt="...">
+                        <img th:src="@{${article.imageUrl}}" class="card-img-top" height="400" alt="...">
                         <div class="card-body">
                             <a th:href="@{'/categories/'+ ${article.category.id}}">
-                                <strong th:text="${article.category.name}" class="d-inline-block mb-2 text-success-emphasis">Category</strong>
+                                <strong th:text="${article.category.name}"
+                                        class="d-inline-block mb-2 text-success-emphasis">Category</strong>
                             </a>
                             <h3 th:text="${article.title}" class="mb-0">Post title</h3>
-                            <small>
-                            <span class="mb-1 text-body-secondary"
+                            <small> <span class="mb-1 text-body-secondary"
                                   th:text="${#temporals.format(article.created, 'MMM dd, yyyy')} + ' · ' + ${article.timeToRead} + ' min read'">created · time to read</span>
                             </small>
-                                <p th:text="${article.content}" class="card-text">Article content</p>
+                            <p th:text="${article.content}" class="card-text">Article content</p>
                             <div th:unless="${article.tags.isEmpty()}" class="pt-3 mb-2">
                                 tags: <span th:each="tag, it : ${article.tags}">
                                          #<a th:href="@{'/tags/'+ ${tag.id}}" th:text="${tag.name}"></a>
                                         <span th:if="${!it.last}">, </span>
                                         </span>
                             </div>
-
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="btn-group">
-                                    <a th:href="@{'/articles/'+ ${article.id} +'/edit'}"
-                                       class="btn btn-sm btn-outline-secondary">
+                                    <a th:href="@{'/articles/'+ ${article.id} +'/edit'}" class="btn btn-sm btn-outline-secondary">
                                         Edit
                                     </a>
-                                    <a th:href="@{'/articles/'+ ${article.id} +'/delete'}"
-                                       class="btn btn-sm btn-outline-secondary">
+                                    <a th:href="@{'/articles/'+ ${article.id} +'/delete'}" class="btn btn-sm btn-outline-secondary">
                                         Delete
                                     </a>
-
                                 </div>
                             </div>
                         </div>
@@ -59,7 +54,10 @@
                                     </a>
                                 </div>
                                 <div class="col">
-                                    <small class="text-body-secondary"><i class="bi bi-chat-fill"></i> 5</small>
+                                    <small class="text-body-secondary">
+                                        <i class="bi bi-chat-fill"></i>
+                                        <span id="commentCount" th:text="${article.comments.size()}">0</span>
+                                    </small>
                                 </div>
                                 <div class="col">
                                     <small>
@@ -68,93 +66,102 @@
                                     </small>
                                 </div>
                             </div>
-
                         </div>
                     </div>
+                </div>
+            </div>
+            <div class="row m-0">
+                <nav class="blog-pagination" aria-label="Pagination">
+                    <a th:if="${articleNavigation.prev != null}" class="btn btn-outline-secondary"
+                       th:href="@{'/articles/'+ ${articleNavigation.prev}}">prev</a>
+                    <a th:if="${articleNavigation.prev == null}" class="btn btn-outline-secondary disabled"
+                       th:href="@{'/articles/'+ ${articleNavigation.prev}}">prev</a>
+                    <a th:if="${articleNavigation.next != null}" class="btn btn-outline-secondary"
+                       th:href="@{'/articles/'+ ${articleNavigation.next}}">next</a>
+                    <a th:if="${articleNavigation.next == null}" class="btn btn-outline-secondary disabled"
+                       th:href="@{'/articles/'+ ${articleNavigation.next}}">next</a>
+                </nav>
+            </div>
 
+            <h3 class="fst-italic">
+                Recent comments
+            </h3>
+            <div class="row">
+                <div id="commentsContainer" class="list-group my-3 mx-0">
+                    <div th:each="comment : ${commentsPage}"
+                         class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+                        <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(23).webp" alt="twbs" width="32" height="32"
+                             class="rounded-circle flex-shrink-0">
+
+                        <div class="d-flex gap-2 w-100 justify-content-between">
+                            <div>
+                                <h6 class="mb-0">John Doe</h6>
+                                <p th:text="${comment.content}" class="mb-0 opacity-75">Comment content</p>
+                            </div>
+                            <small th:text="${#temporals.format(comment.created, 'MMM dd, yyyy')}" class="opacity-50 text-nowrap">now</small>
+                        </div>
+                    </div>
                 </div>
             </div>
 
+<!--            <div id="commentsContainer" class="list-group my-3 mx-0">-->
+<!--                <div th:each="comment : ${commentsPage}"-->
+<!--                     class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">-->
+<!--                    <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(23).webp" alt="twbs" width="32" height="32"-->
+<!--                         class="rounded-circle flex-shrink-0">-->
 
-            <nav class="blog-pagination" aria-label="Pagination">
-                <a class="btn btn-outline-primary rounded-pill" href="#">Older</a>
-                <a class="btn btn-outline-secondary rounded-pill disabled" aria-disabled="true">Newer</a>
-            </nav>
+<!--                    <div class="d-flex gap-2 w-100 justify-content-between">-->
+<!--                        <div>-->
+<!--                            <h6 class="mb-0">John Doe</h6>-->
+<!--                            <p th:text="${comment.content}" class="mb-0 opacity-75">Comment content</p>-->
+<!--                        </div>-->
+<!--                        <small th:text="${#temporals.format(comment.created, 'MMM dd, yyyy')}" class="opacity-50 text-nowrap">now</small>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+            <div th:replace="~{template :: pagination-comments(href='/articles/' + ${article.titleUrl},
+                        currentPage=${commentsPage.getNumber()},
+                        totalPages=${commentsPage.getTotalPages()})}">
+            </div>
+            <div id="commentContainer" class="mb-3">
+                <form id="commentForm" th:object="${commentDto}" method="post" th:action="@{'/articles/' + ${article.titleUrl} + '/comments/add'}">
+                    <div class="mb-3">
+                        <label for="content" class="form-label">Comment form</label>
+                        <textarea th:field="*{content}" id="content" name="content" class="form-control" rows="6"></textarea>
+                        <small><span class="text text-danger" th:if="${#fields.hasErrors('content')}"
+                                     th:errors="*{content}"></span></small>
+                    </div>
+                    <button type="submit" id="submitBtn" class="btn btn-outline-secondary">Add comment</button>
+                </form>
+            </div>
+<!--            <div id="commentContainer" class="mb-3">-->
+<!--                <form id="commentForm" th:object="${commentDto}" method="post" th:attr="data-article-id=${article.id}">-->
+<!--                    <div class="mb-3">-->
+<!--                        <label for="content" class="form-label">Comment form</label>-->
+<!--                        <textarea id="content" class="form-control" rows="6"></textarea>-->
+<!--                        <small><span class="text text-danger" id="error"></span></small>-->
+<!--                    </div>-->
+<!--                    <button type="button" id="submitBtn" class="btn btn-outline-secondary">Add comment</button>-->
+<!--                </form>-->
+<!--            </div>-->
 
         </div>
 
         <div class="col-md-4">
             <div class="position-sticky" style="top: 2rem;">
-                <div class="p-4 mb-3 bg-body-tertiary rounded">
-                    <h4 class="fst-italic">About</h4>
-                    <p class="mb-0">Customize this section to tell your visitors a little bit about your publication,
-                        writers, content, or something else entirely. Totally up to you.</p>
+                <div class="p-2 mb-3 bg-body-tertiary rounded text-center">
+                    <img src="https://picsum.photos/id/823/5000/3333" class="bd-placeholder-img rounded-circle m-3" width="140" height="140">
+                    <h4 class="fw-normal">Julia Williams</h4>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                        Exercitationem facilis sunt repellendus excepturi beatae porro debitis voluptate nulla quo veniam fuga sit molestias minus.</p>
+                    <p><a class="btn btn-outline-secondary" href="#">View details &raquo;</a></p>
                 </div>
 
-                <div>
-                    <h4 class="fst-italic">Recent posts</h4>
-                    <ul class="list-unstyled">
-                        <li>
-                            <a class="d-flex flex-column flex-lg-row gap-3 align-items-start align-items-lg-center py-3 link-body-emphasis text-decoration-none border-top"
-                               href="#">
-                                <svg class="bd-placeholder-img" width="100%" height="96"
-                                     xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
-                                     preserveAspectRatio="xMidYMid slice" focusable="false">
-                                    <rect width="100%" height="100%" fill="#777"/>
-                                </svg>
-                                <div class="col-lg-8">
-                                    <h6 class="mb-0">Example blog post title</h6>
-                                    <small class="text-body-secondary">January 15, 2024</small>
-                                </div>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="d-flex flex-column flex-lg-row gap-3 align-items-start align-items-lg-center py-3 link-body-emphasis text-decoration-none border-top"
-                               href="#">
-                                <svg class="bd-placeholder-img" width="100%" height="96"
-                                     xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
-                                     preserveAspectRatio="xMidYMid slice" focusable="false">
-                                    <rect width="100%" height="100%" fill="#777"/>
-                                </svg>
-                                <div class="col-lg-8">
-                                    <h6 class="mb-0">This is another blog post title</h6>
-                                    <small class="text-body-secondary">January 14, 2024</small>
-                                </div>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="d-flex flex-column flex-lg-row gap-3 align-items-start align-items-lg-center py-3 link-body-emphasis text-decoration-none border-top"
-                               href="#">
-                                <svg class="bd-placeholder-img" width="100%" height="96"
-                                     xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
-                                     preserveAspectRatio="xMidYMid slice" focusable="false">
-                                    <rect width="100%" height="100%" fill="#777"/>
-                                </svg>
-                                <div class="col-lg-8">
-                                    <h6 class="mb-0">Longer blog post title: This one has multiple lines!</h6>
-                                    <small class="text-body-secondary">January 13, 2024</small>
-                                </div>
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+                <div th:replace="~{template :: popular-articles(tagstop3articles = ${tagstop3articles})}"></div>
 
-                <div class="p-4">
-                    <h4 class="fst-italic">Archives</h4>
-                    <ol class="list-unstyled mb-0">
-                        <li><a href="#">March 2021</a></li>
-                        <li><a href="#">February 2021</a></li>
-                        <li><a href="#">January 2021</a></li>
-                        <li><a href="#">December 2020</a></li>
-                        <li><a href="#">November 2020</a></li>
-                        <li><a href="#">October 2020</a></li>
-                        <li><a href="#">September 2020</a></li>
-                        <li><a href="#">August 2020</a></li>
-                        <li><a href="#">July 2020</a></li>
-                        <li><a href="#">June 2020</a></li>
-                        <li><a href="#">May 2020</a></li>
-                        <li><a href="#">April 2020</a></li>
-                    </ol>
+                <div th:replace="~{template :: popular-tags(tags = ${tags})}"></div>
+                <div class="row">
+                    <div th:replace="~{template :: archive-articles(monthYearList = ${monthYearList})}"></div>
                 </div>
 
                 <div class="p-4">
@@ -172,8 +179,85 @@
 </main>
 
 
-
 <th:block th:replace="~{template :: footer}"/>
+
+<script>
+    // document.getElementById("submitBtn").addEventListener("click", function () {
+    //     let content = document.getElementById("content").value;
+    //     let articleId = document.getElementById("commentForm").getAttribute("data-article-id");
+    //     fetch("/api/v1/articles/" + articleId + "/comments", {
+    //         method: "POST",
+    //         headers: {
+    //             "Content-Type": "application/json"
+    //         },
+    //         body: JSON.stringify({content: content})
+    //     })
+    //         .then(function (response) {
+    //             if (!response.ok) {
+    //                 throw new Error("Błąd podczas dodawania komentarza");
+    //             }
+    //             return response.text();
+    //         })
+    //         .then(function (text) {
+    //             console.log("Odpowiedź serwera:", text);
+    //             let commentData = JSON.parse(text);
+    //
+    //             let newCommentDiv = document.createElement("div");
+    //             newCommentDiv.className = "list-group-item list-group-item-action d-flex gap-3 py-3";
+    //             let img = document.createElement("img");
+    //             img.src = "https://picsum.photos/id/500/200/300";
+    //             img.alt = "twbs";
+    //             img.width = "32";
+    //             img.height = "32";
+    //             img.className = "rounded-circle flex-shrink-0";
+    //
+    //             let commentDetailsDiv = document.createElement("div");
+    //             commentDetailsDiv.className = "d-flex gap-2 w-100 justify-content-between";
+    //             let commentDetailsDiv1 = document.createElement("div");
+    //             let commenterName = document.createElement("h6");
+    //             commenterName.className = "mb-0";
+    //             commenterName.textContent = "John Doe";
+    //
+    //             let commentContent = document.createElement("p");
+    //             commentContent.className = "mb-0 opacity-75";
+    //             commentContent.textContent = commentData.content;
+    //
+    //             let commentTimestamp = document.createElement("small");
+    //             commentTimestamp.className = "opacity-50 text-nowrap";
+    //             commentTimestamp.textContent = commentData.created;
+    //             commentDetailsDiv1.appendChild(commenterName);
+    //             commentDetailsDiv1.appendChild(commentContent);
+    //             commentDetailsDiv.appendChild(commentDetailsDiv1);
+    //             commentDetailsDiv.appendChild(commentTimestamp);
+    //
+    //             newCommentDiv.appendChild(img);
+    //             newCommentDiv.appendChild(commentDetailsDiv);
+    //
+    //             let commentsContainer = document.getElementById("commentsContainer");
+    //             commentsContainer.appendChild(newCommentDiv);
+    //             document.getElementById("content").value = "";
+    //             fetch("/api/v1/articles/" + articleId + "/comments")
+    //                 .then(function (response) {
+    //                     if (!response.ok) {
+    //                         throw new Error("Błąd podczas pobierania komentarzy");
+    //                     }
+    //                     return response.text();
+    //                 })
+    //                 .then(function (text) {
+    //                     let commentsData = JSON.parse(text);
+    //                     document.getElementById("commentCount").textContent = commentsData.length;
+    //                 })
+    //                 .catch(function (error) {
+    //                     console.error(error);
+    //                 });
+    //         })
+    //         .catch(function (error) {
+    //             console.error("Unexpected end of JSON input", error);
+    //         });
+    // });
+
+
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"

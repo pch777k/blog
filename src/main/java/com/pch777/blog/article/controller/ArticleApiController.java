@@ -2,8 +2,14 @@ package com.pch777.blog.article.controller;
 
 import com.pch777.blog.article.domain.model.Article;
 import com.pch777.blog.article.dto.ArticleDto;
+import com.pch777.blog.article.dto.ShortArticleDto;
+import com.pch777.blog.article.dto.SummaryArticleDto;
 import com.pch777.blog.article.service.ArticleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,19 +23,29 @@ public class ArticleApiController {
 
     private final ArticleService articleService;
 
-    @GetMapping
-    public List<Article> getArticles() {
-        return articleService.getArticles();
-    }
-
-//    @GetMapping("{id}")
-//    public Article getArticle(@PathVariable UUID id) {
-//        return articleService.getArticleById(id);
+//    @GetMapping
+//    public List<Article> getArticles() {
+//        return articleService.getArticles();
 //    }
+
+    @GetMapping
+    public Page<SummaryArticleDto> getArticles(
+                        @RequestParam(name = "field", required = false, defaultValue = "created") String field,
+                        @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                        @RequestParam(name = "size", required = false, defaultValue = "2") int size
+    ) {
+        Pageable pageable = PageRequest.of(page,size, Sort.by(field).descending());
+        return articleService.getSummaryArticles(pageable);
+    }
 
     @GetMapping("{titleUrl}")
     public Article getArticle(@PathVariable String titleUrl) {
         return articleService.getArticleByTitleUrl(titleUrl);
+    }
+
+    @GetMapping("top")
+    public List<ShortArticleDto> getTopArticle() {
+        return articleService.getTop3PopularArticles();
     }
 
     @PostMapping

@@ -24,47 +24,30 @@ import static com.pch777.blog.common.ControllerUtils.paging;
 @RequestMapping("/tags")
 public class TagViewController extends BlogCommonViewController {
 
-    private final ArticleService articleService;
-    private final TagService tagService;
-
     public TagViewController(CategoryService categoryService,
                              ArticleService articleService,
                              TagService tagService) {
-        super(categoryService);
-        this.articleService = articleService;
+        super(categoryService, articleService, tagService);
         this.tagService = tagService;
     }
 
-    @GetMapping("{id}")
+    @GetMapping("{id}/articles")
     public String indexView(@PathVariable UUID id,
             @RequestParam(name = "field", required = false, defaultValue = "created") String field,
-            @RequestParam(name = "direction", required = false, defaultValue = "desc") String direction,
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
             @RequestParam(name = "size", required = false, defaultValue = "2") int size,
             Model model
     ) {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(direction), field);
-
-        String reverseSort = null;
-        if ("asc".equals(direction)) {
-            reverseSort = "desc";
-        } else {
-            reverseSort = "asc";
-        }
+        Pageable pageable = PageRequest.of(page, size, Sort.by(field));
 
         Page<SummaryArticleDto> summaryArticlesPage =  articleService.getSummaryArticlesByTagId(id, pageable);
         model.addAttribute("summaryArticlesPage", summaryArticlesPage);
-        model.addAttribute("field", field);
-        model.addAttribute("direction", direction);
-        model.addAttribute("reverseSort", reverseSort);
-
         model.addAttribute("tagId", id);
         model.addAttribute("tagName", tagService.getTagById(id).getName());
 
         addGlobalAttributes(model);
-
-        paging(model, summaryArticlesPage);
+        paging(model, summaryArticlesPage, size);
 
         return "tag/index";
     }

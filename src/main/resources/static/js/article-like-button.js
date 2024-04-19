@@ -8,7 +8,7 @@ $(document).ready(function () {
             success: function () {
                 let currentLikes = parseInt(likesElement.text());
                 likesElement.text(currentLikes + 1);
-                console.log("Likes increased successfully! number of likes: " + (currentLikes + 1));
+                console.log("Likes increased successfully!");
             },
             error: function (xhr, status, error) {
                 console.error("Error while increasing likes:", error);
@@ -16,3 +16,4 @@ $(document).ready(function () {
         });
     });
 });
+

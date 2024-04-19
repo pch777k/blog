@@ -32,5 +32,7 @@ public class SummaryArticleDto {
 
     private int likes;
 
+    private int totalComments;
+
 
 }

@@ -3,11 +3,10 @@ package com.pch777.blog.article.domain.model;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.pch777.blog.category.domain.model.Category;
+import com.pch777.blog.comment.domain.model.Comment;
 import com.pch777.blog.tag.domain.model.Tag;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -16,12 +15,16 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Entity
 @Table(name = "articles")
 public class Article {
+
+    public static final int WORDS_PER_MINUTE = 200;
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -49,15 +52,12 @@ public class Article {
     @ManyToOne
     private Category category;
 
+    @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Comment> comments = new HashSet<>();
+
     private LocalDateTime created;
 
     private LocalDateTime modified;
-
-    public Article(String title, String content) {
-        this();
-        this.title = title;
-        this.content = content;
-    }
 
     @PrePersist
     void prePersist() {
@@ -95,7 +95,6 @@ public class Article {
         return text;
     }
 
-    public static final int WORDS_PER_MINUTE = 200;
     public void calculateTimeToRead() {
         int totalWords = calculateTotalWords();
         this.timeToRead = (int) Math.ceil((double) totalWords / WORDS_PER_MINUTE);
@@ -121,6 +120,12 @@ public class Article {
         Article self = this;
         tags.forEach(tag -> tag.getArticles().remove(self));
         tags.clear();
+    }
+
+    public Article addComment(Comment comment) {
+        comment.setArticle(this);
+        comments.add(comment);
+        return this;
     }
 
 }

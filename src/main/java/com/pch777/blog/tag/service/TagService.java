@@ -16,6 +16,7 @@ import java.util.UUID;
 @Service
 public class TagService {
 
+    public static final String TAG_NOT_FOUND_WITH_ID = "Tag not found with id: ";
     private final TagRepository tagRepository;
 
     @Transactional(readOnly = true)
@@ -24,9 +25,14 @@ public class TagService {
     }
 
     @Transactional(readOnly = true)
+    public List<Tag> get10TagsByPopularity() {
+        return tagRepository.find10TagsByPopularity();
+    }
+
+    @Transactional(readOnly = true)
     public Tag getTagById(UUID id) {
         return tagRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Tag not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(TAG_NOT_FOUND_WITH_ID + id));
     }
 
     @Transactional(readOnly = true)
@@ -45,21 +51,10 @@ public class TagService {
         return tagRepository.save(tag);
     }
 
-//    @Transactional
-//    public void createTags(List<TagDto> tagDtoList) {
-//        for(TagDto tagDto : tagDtoList) {
-//            if (!isTagExists(tagDto.getName())) {
-//                Tag tag = new Tag();
-//                tag.setName(tagDto.getName());
-//                tagRepository.save(tag);
-//            }
-//        }
-//    }
-
     @Transactional
     public Tag updateTag(UUID id, TagDto tagDto) {
         Tag tag = tagRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Tag not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(TAG_NOT_FOUND_WITH_ID + id));
         tag.setName(tagDto.getName());
         return tagRepository.save(tag);
     }
@@ -67,7 +62,7 @@ public class TagService {
     @Transactional
     public void deleteTag(UUID id) {
         Tag tag = tagRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Tag not found with id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException(TAG_NOT_FOUND_WITH_ID + id));
         tag.removeArticles();
         tagRepository.delete(tag);
     }

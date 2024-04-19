@@ -1,11 +1,10 @@
 package com.pch777.blog.category.controller;
 
 import com.pch777.blog.article.dto.SummaryArticleDto;
-import com.pch777.blog.article.service.ArticleMapper;
 import com.pch777.blog.article.service.ArticleService;
-import com.pch777.blog.article.service.ArticleStatsService;
 import com.pch777.blog.category.service.CategoryService;
 import com.pch777.blog.common.BlogCommonViewController;
+import com.pch777.blog.tag.service.TagService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -22,44 +21,30 @@ import static com.pch777.blog.common.ControllerUtils.paging;
 @RequestMapping("/categories")
 public class CategoryViewController extends BlogCommonViewController {
 
-    private final ArticleService articleService;
-
     public CategoryViewController(CategoryService categoryService,
-                                  ArticleService articleService) {
-        super(categoryService);
-        this.articleService = articleService;
+                                  ArticleService articleService,
+                                  TagService tagService) {
+        super(categoryService, articleService, tagService);
     }
 
     @GetMapping("{id}")
     public String indexView(@PathVariable UUID id,
             @RequestParam(name = "field", required = false, defaultValue = "created") String field,
-            @RequestParam(name = "direction", required = false, defaultValue = "desc") String direction,
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
             @RequestParam(name = "size", required = false, defaultValue = "2") int size,
             Model model
     ) {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.Direction.fromString(direction), field);
-
-        String reverseSort = null;
-        if ("asc".equals(direction)) {
-            reverseSort = "desc";
-        } else {
-            reverseSort = "asc";
-        }
+        Pageable pageable = PageRequest.of(page, size, Sort.by(field));
 
         Page<SummaryArticleDto> summaryArticlesPage =  articleService.getSummaryArticlesByCategoryId(id, pageable);
         model.addAttribute("summaryArticlesPage", summaryArticlesPage);
-        model.addAttribute("field", field);
-        model.addAttribute("direction", direction);
-        model.addAttribute("reverseSort", reverseSort);
-
         model.addAttribute("activeCategoryId", id);
         model.addAttribute("categoryName", categoryService.getCategoryById(id).getName());
+        model.addAttribute("top3articles", articleService.getTop3PopularArticles());
 
         addGlobalAttributes(model);
-
-        paging(model, summaryArticlesPage);
+        paging(model, summaryArticlesPage, size);
 
         return "category/index";
     }

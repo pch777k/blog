@@ -9,7 +9,6 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="/js/article-like-button.js"></script>
 
-<!--    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@docsearch/css@3">-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -93,7 +92,6 @@
         }
     </style>
 
-
     <!-- Custom styles for this template -->
     <link href="https://fonts.googleapis.com/css?family=Playfair&#43;Display:700,900&amp;display=swap" rel="stylesheet">
     <!-- Custom styles for this template -->
@@ -116,14 +114,6 @@
             </div>
             <div class="col-2 d-flex justify-content-end align-items-center">
 
-<!--                <a class="link-secondary" href="#" aria-label="Search">-->
-<!--                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="currentColor"-->
-<!--                         stroke-linecap="round" stroke-linejoin="round" stroke-width="2" class="mx-3" role="img"-->
-<!--                         viewBox="0 0 24 24"><title>Search</title>-->
-<!--                        <circle cx="10.5" cy="10.5" r="7.5"/>-->
-<!--                        <path d="M21 21l-5.2-5.2"/>-->
-<!--                    </svg>-->
-<!--                </a>-->
                 <a class="btn btn-sm btn-outline-secondary" href="#">Sign up</a>
             </div>
         </div>
@@ -188,7 +178,12 @@
                                     </a>
                                 </div>
                                 <div class="col">
-                                    <small class="text-body-secondary"><i class="bi bi-chat-fill"></i> 5</small>
+                                    <a th:href="@{'/articles/'+ ${article.titleUrl} + '#commentsContainer'}">
+                                    <small class="text-body-secondary">
+                                        <i class="bi bi-chat-fill"></i>
+                                        <span th:text="${article.totalComments}">0</span>
+                                    </small>
+                                    </a>
                                 </div>
                                 <div class="col">
                                     <small class="text-body-secondary">
@@ -301,23 +296,17 @@
                 </div>
             </div>
 
-
-
-
-
-
             <nav class="blog-pagination" aria-label="Pagination">
                 <a class="btn btn-outline-primary rounded-pill" href="#">Older</a>
                 <a class="btn btn-outline-secondary rounded-pill disabled" aria-disabled="true">Newer</a>
             </nav>
-
-
 
         </div>
 
         <div class="col-md-4">
             <form th:fragment="search-form(search)" class="col-12 col-lg-auto mb-3" role="search" th:action="@{'/search'}">
                 <div class="input-group">
+                    <input type="hidden" name="size" th:value="${size}" />
                     <input name="s" th:value="${search}" type="search" class="form-control" placeholder="Search..." aria-label="Search" required>
                     <button type="submit" class="btn btn-secondary">Search</button>
                 </div>
@@ -329,72 +318,51 @@
                         writers, content, or something else entirely. Totally up to you.</p>
                 </div>
 
-                <div>
-                    <h4 class="fst-italic">Recent posts</h4>
-                    <ul class="list-unstyled">
-                        <li>
-                            <a class="d-flex flex-column flex-lg-row gap-3 align-items-start align-items-lg-center py-3 link-body-emphasis text-decoration-none border-top"
-                               href="#">
-                                <svg class="bd-placeholder-img" width="100%" height="96"
-                                     xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
-                                     preserveAspectRatio="xMidYMid slice" focusable="false">
-                                    <rect width="100%" height="100%" fill="#777"/>
-                                </svg>
-                                <div class="col-lg-8">
-                                    <h6 class="mb-0">Example blog post title</h6>
-                                    <small class="text-body-secondary">January 15, 2024</small>
+                <div th:fragment="popular-articles(tagstop3articles)">
+                    <h4 class="fst-italic">Popular articles</h4>
+                    <div th:each="shortArticle : ${top3articles}" class="card mb-3">
+                        <a th:href="@{'/articles/'+ ${shortArticle.titleUrl}}">
+                            <div class="row g-0">
+                                <div class="col-md-4">
+                                    <img th:src="@{${shortArticle.imageUrl}}" class="img-fluid rounded-start" alt="...">
                                 </div>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="d-flex flex-column flex-lg-row gap-3 align-items-start align-items-lg-center py-3 link-body-emphasis text-decoration-none border-top"
-                               href="#">
-                                <svg class="bd-placeholder-img" width="100%" height="96"
-                                     xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
-                                     preserveAspectRatio="xMidYMid slice" focusable="false">
-                                    <rect width="100%" height="100%" fill="#777"/>
-                                </svg>
-                                <div class="col-lg-8">
-                                    <h6 class="mb-0">This is another blog post title</h6>
-                                    <small class="text-body-secondary">January 14, 2024</small>
+                                <div class="col-md-8">
+                                    <div class="card-body">
+                                        <h6 th:text="${shortArticle.title}" class="card-title">Card title</h6>
+                                        <p class="card-text"><small
+                                                th:text="${#temporals.format(shortArticle.created, 'MMMM dd, yyyy')}"
+                                                class="text-muted">created</small></p>
+                                    </div>
                                 </div>
-                            </a>
-                        </li>
-                        <li>
-                            <a class="d-flex flex-column flex-lg-row gap-3 align-items-start align-items-lg-center py-3 link-body-emphasis text-decoration-none border-top"
-                               href="#">
-                                <svg class="bd-placeholder-img" width="100%" height="96"
-                                     xmlns="http://www.w3.org/2000/svg" aria-hidden="true"
-                                     preserveAspectRatio="xMidYMid slice" focusable="false">
-                                    <rect width="100%" height="100%" fill="#777"/>
-                                </svg>
-                                <div class="col-lg-8">
-                                    <h6 class="mb-0">Longer blog post title: This one has multiple lines!</h6>
-                                    <small class="text-body-secondary">January 13, 2024</small>
-                                </div>
-                            </a>
-                        </li>
-                    </ul>
+                            </div>
+                        </a>
+                    </div>
                 </div>
 
-                <div class="p-4">
-                    <h4 class="fst-italic">Archives</h4>
-                    <ol class="list-unstyled mb-0">
-                        <li><a href="#">March 2021</a></li>
-                        <li><a href="#">February 2021</a></li>
-                        <li><a href="#">January 2021</a></li>
-                        <li><a href="#">December 2020</a></li>
-                        <li><a href="#">November 2020</a></li>
-                        <li><a href="#">October 2020</a></li>
-                        <li><a href="#">September 2020</a></li>
-                        <li><a href="#">August 2020</a></li>
-                        <li><a href="#">July 2020</a></li>
-                        <li><a href="#">June 2020</a></li>
-                        <li><a href="#">May 2020</a></li>
-                        <li><a href="#">April 2020</a></li>
-                    </ol>
-                </div>
 
+                <div th:fragment="popular-tags(tags)">
+                    <h4 class="fst-italic">Popular tags</h4>
+                    <div class="row">
+                        <ul class="tags">
+                            <li><a th:each="tag : ${tags}" th:href="@{'/tags/'+ ${tag.id} + '/articles'}" th:text="${'#' + tag.name}"
+                                   style="margin: 0 4px 4px 0;">Travel</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div th:fragment="archive-articles(monthYearList)">
+                    <div class="row">
+                        <div class="col">
+                            <h4 class="fst-italic">Archives</h4>
+                            <ul class="list-unstyled">
+                                <li th:each="monthYear : ${monthYearList}">
+                                    <a th:href="@{'/articles/' + ${monthYear.year} + '/' + ${monthYear.month}}"
+                                       th:text="${monthYear.month + ' ' + monthYear.year}"
+                                       class="archive-link"></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
                 <div class="p-4">
                     <h4 class="fst-italic">Elsewhere</h4>
                     <ol class="list-unstyled">
@@ -409,40 +377,157 @@
 
 </main>
 
-<div th:fragment="pagination-articles(href, currentPage, totalPages, search)">
+<div th:fragment="pagination-articles(href, currentPage, totalPages, search, size)">
     <!-- Pagination articles -->
     <nav th:if="${totalPages > 1}" aria-label="Page navigation">
         <ul class="pagination pagination-sm">
-            <li th:if="${totalPages > 2}" class="page-item" th:class="${currentPage == 0} ? 'disabled'">
-                <a th:if="${search != null}" class="page-link" th:href="@{${href} (page=${0}, s=${search})}">&laquo;</a>
-                <a th:if="${search == null}" class="page-link" th:href="@{${href} (page=${0})}">&laquo;</a>
-            </li>
-            <li class="page-item" th:class="${currentPage == 0} ? 'disabled'">
+            <li th:class="'page-item' + ${currentPage == 0 ? ' disabled' : ''}">
                 <a th:if="${search != null}" class="page-link" th:href="@{${href} (page=${currentPage - 1}, s=${search})}">&lsaquo;</a>
-                <a th:if="${search == null}" class="page-link" th:href="@{${href} (page=${currentPage - 1})}">&lsaquo;</a>
+                <a th:if="${search == null}" class="page-link" th:href="@{${href} (page=${currentPage - 1}, size=${size})}">&lsaquo;</a>
             </li>
-            <th:block th:each="i: ${#numbers.sequence(0, totalPages - 1)}">
+            <li th:if="${currentPage >= 2}" class="page-item">
+                <a th:if="${search != null}" class="page-link" th:href="@{${href} (page=${0}, s=${search}, size=${size})}">1</a>
+                <a th:if="${search == null}" class="page-link" th:href="@{${href} (page=${0}, size=${size})}">1</a>
+            </li>
+            <li th:if="${currentPage > 2}" class="page-item">
+                <span class="page-link">...</span>
+            </li>
+            <th:block th:each="i: ${#numbers.sequence(currentPage - 1, currentPage + 1)}" th:if="${i >= 0 && i < totalPages}">
                 <li class="page-item" th:class="${currentPage == i} ? 'active'">
                     <a class="page-link"
-                       th:if="${currentPage != i && search != null}" th:href="@{${href} (page=${i}, s=${search})}" th:text="${i + 1}"></a>
+                       th:if="${currentPage != i && search != null}" th:href="@{${href} (page=${i}, s=${search}, size=${size})}" th:text="${i + 1}"></a>
                     <a class="page-link"
-                       th:if="${currentPage != i && search == null}" th:href="@{${href} (page=${i})}" th:text="${i + 1}"></a>
+                       th:if="${currentPage != i && search == null}" th:href="@{${href} (page=${i}, size=${size})}" th:text="${i + 1}"></a>
                     <a class="page-link" th:if="${currentPage == i}" th:text="${i + 1}" disabled></a>
                 </li>
             </th:block>
-            <li class="page-item" th:class="${currentPage == totalPages - 1} ? 'disabled'">
-                <a th:if="${search != null}" class="page-link" th:href="@{${href} (page=${currentPage + 1}, s=${search})}">&rsaquo;</a>
-                <a th:if="${search == null}" class="page-link" th:href="@{${href} (page=${currentPage + 1})}">&rsaquo;</a>
+            <li th:if="${currentPage < totalPages - 3}" class="page-item">
+                <span class="page-link">...</span>
             </li>
-            <li th:if="${totalPages > 2}" class="page-item" th:class="${currentPage == totalPages - 1} ? 'disabled'">
-                <a th:if="${search != null}" class="page-link" th:href="@{${href} (page=${totalPages - 1}, s=${search})}">&raquo;</a>
-                <a th:if="${search == null}" class="page-link" th:href="@{${href} (page=${totalPages - 1})}">&raquo;</a>
+            <li th:if="${currentPage <= totalPages - 3}" class="page-item">
+                <a th:if="${search != null}" class="page-link" th:href="@{${href} (page=${totalPages - 1}, s=${search}, size=${size})}" th:text="${totalPages}"></a>
+                <a th:if="${search == null}" class="page-link" th:href="@{${href} (page=${totalPages - 1}, size=${size})}" th:text="${totalPages}"></a>
+            </li>
+            <li th:class="'page-item' + ${currentPage == totalPages - 1 ? ' disabled' : ''}">
+                <a th:if="${search != null}" class="page-link" th:href="@{${href} (page=${currentPage + 1}, s=${search}, size=${size})}">&rsaquo;</a>
+                <a th:if="${search == null}" class="page-link" th:href="@{${href} (page=${currentPage + 1}, size=${size})}">&rsaquo;</a>
             </li>
         </ul>
     </nav>
     <!-- Pagination articles -->
 </div>
 
+<div th:fragment="pagination-comments(href, currentPage, totalPages)">
+    <!-- Pagination articles -->
+    <nav th:if="${totalPages > 1}" aria-label="Page navigation">
+        <ul class="pagination pagination-sm">
+            <li th:class="'page-item' + ${currentPage == 0 ? ' disabled' : ''}">
+                <a class="page-link" th:href="@{${href} (page=${currentPage - 1})}">&lsaquo;</a>
+<!--                <a th:if="${search == null}" class="page-link" th:href="@{${href} (page=${currentPage - 1}, size=${size})}">&lsaquo;</a>-->
+            </li>
+            <li th:if="${currentPage >= 2}" class="page-item">
+                <a class="page-link" th:href="@{${href} (page=${0})}">1</a>
+<!--                <a th:if="${search == null}" class="page-link" th:href="@{${href} (page=${0}, size=${size})}">1</a>-->
+            </li>
+            <li th:if="${currentPage > 2}" class="page-item">
+                <span class="page-link">...</span>
+            </li>
+            <th:block th:each="i: ${#numbers.sequence(currentPage - 1, currentPage + 1)}" th:if="${i >= 0 && i < totalPages}">
+                <li class="page-item" th:class="${currentPage == i} ? 'active'">
+                    <a class="page-link"
+                       th:if="${currentPage != i}" th:href="@{${href} (page=${i})}" th:text="${i + 1}"></a>
+<!--                    <a class="page-link"-->
+<!--                       th:if="${currentPage != i && search == null}" th:href="@{${href} (page=${i}, size=${size})}" th:text="${i + 1}"></a>-->
+                    <a class="page-link" th:if="${currentPage == i}" th:text="${i + 1}" disabled></a>
+                </li>
+            </th:block>
+            <li th:if="${currentPage < totalPages - 3}" class="page-item">
+                <span class="page-link">...</span>
+            </li>
+            <li th:if="${currentPage <= totalPages - 3}" class="page-item">
+                <a class="page-link" th:href="@{${href} (page=${totalPages - 1})}" th:text="${totalPages}"></a>
+<!--                <a th:if="${search == null}" class="page-link" th:href="@{${href} (page=${totalPages - 1}, size=${size})}" th:text="${totalPages}"></a>-->
+            </li>
+            <li th:class="'page-item' + ${currentPage == totalPages - 1 ? ' disabled' : ''}">
+                <a class="page-link" th:href="@{${href} (page=${currentPage + 1})}">&rsaquo;</a>
+<!--                <a th:if="${search == null}" class="page-link" th:href="@{${href} (page=${currentPage + 1}, size=${size})}">&rsaquo;</a>-->
+            </li>
+        </ul>
+    </nav>
+    <!-- Pagination articles -->
+</div>
+<div class="comments-pagination" data-article-title-url="${article.titleUrl}">
+    <!-- Pagination comments -->
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+            <!-- Wyświetl numery stron komentarzy -->
+            <li class="page-item" th:each="pageNumber : ${#numbers.sequence(0, commentsPage.getTotalPages() - 1)}">
+                <a class="page-link" href="#" th:text="${pageNumber + 1}" th:attr="data-page-number=${pageNumber}"></a>
+            </li>
+        </ul>
+    </nav>
+    <!-- Pagination comments -->
+</div>
+<!--<div th:fragment="pagination-articles(href, currentPage, totalPages, search, size)">-->
+<!--    &lt;!&ndash; Pagination articles &ndash;&gt;-->
+<!--    <nav th:if="${totalPages > 1}" aria-label="Page navigation">-->
+<!--        <ul class="pagination pagination-sm">-->
+<!--            <li th:class="'page-item' + ${currentPage == 0 ? ' disabled' : ''}">-->
+<!--                <a th:if="${search != null}" class="page-link" th:href="@{${href} (page=${currentPage}, s=${search}, size=${size})}">&lsaquo;</a>-->
+<!--                <a th:if="${search == null}" class="page-link" th:href="@{${href} (page=${currentPage}, size=${size})}">&lsaquo;</a>-->
+<!--            </li>-->
+<!--            <li th:if="${currentPage >= 2}" class="page-item">-->
+<!--                <a th:if="${search != null}" class="page-link" th:href="@{${href} (page=${1}, s=${search}, size=${size})}">1</a>-->
+<!--                <a th:if="${search == null}" class="page-link" th:href="@{${href} (page=${1}, size=${size})}">1</a>-->
+<!--            </li>-->
+<!--            <li th:if="${currentPage > 3}" class="page-item">-->
+<!--                <span class="page-link">...</span>-->
+<!--            </li>-->
+<!--            <th:block th:each="i: ${#numbers.sequence(1, totalPages)}">-->
+<!--                <li class="page-item" th:class="${currentPage == i - 1} ? 'active'">-->
+<!--                    <a class="page-link"-->
+<!--                       th:if="${currentPage != i - 1 && search != null}" th:href="@{${href} (page=${i}, s=${search}, size=${size})}" th:text="${i}"></a>-->
+<!--                    <a class="page-link"-->
+<!--                       th:if="${currentPage != i - 1 && search == null}" th:href="@{${href} (page=${i}, size=${size})}" th:text="${i}"></a>-->
+<!--                    <a class="page-link" th:if="${currentPage == i - 1}" th:text="${i}" disabled></a>-->
+<!--                </li>-->
+<!--            </th:block>-->
+<!--            <li th:if="${currentPage < totalPages - 2}" class="page-item">-->
+<!--                <span class="page-link">...</span>-->
+<!--            </li>-->
+<!--            <li th:if="${currentPage <= totalPages - 2}" class="page-item">-->
+<!--                <a th:if="${search != null}" class="page-link" th:href="@{${href} (page=${totalPages}, s=${search}, size=${size})}" th:text="${totalPages}"></a>-->
+<!--                <a th:if="${search == null}" class="page-link" th:href="@{${href} (page=${totalPages}, size=${size})}" th:text="${totalPages}"></a>-->
+<!--            </li>-->
+<!--            <li th:class="'page-item' + ${currentPage == totalPages - 1 ? ' disabled' : ''}">-->
+<!--                <a th:if="${search != null}" class="page-link" th:href="@{${href} (page=${currentPage + 2}, s=${search}, size=${size})}">&rsaquo;</a>-->
+<!--                <a th:if="${search == null}" class="page-link" th:href="@{${href} (page=${currentPage + 2}, size=${size})}">&rsaquo;</a>-->
+<!--            </li>-->
+<!--        </ul>-->
+<!--    </nav>-->
+<!--    &lt;!&ndash; Pagination articles &ndash;&gt;-->
+<!--</div>-->
+
+<div th:fragment="pageNumber(href, currentPage, totalPages)" class="col-sm-2">
+    <label for="pageNumberSelect" class="form-label">number</label>
+    <select id="pageNumberSelect" class="form-select-sm" onchange="window.location.href = this.value;">
+        <option th:each="i: ${#numbers.sequence(1, totalPages)}"
+                th:value="@{${href}(page=${i - 1})}"
+                th:text="${i}"
+                th:selected="${i == currentPage + 1}">page number
+        </option>
+    </select>
+</div>
+<div th:fragment="pageSize(href, size)" class="col-sm-2">
+    <label for="pageSizeSelect" class="form-label">size</label>
+    <select id="pageSizeSelect" class="form-select-sm" onchange="window.location.href = this.value;">
+        <option th:each="i: ${#numbers.sequence(1, 10)}"
+                th:value="@{${href}(size=${i})}"
+                th:text="${i}"
+                th:selected="${i == size}">page number
+        </option>
+    </select>
+</div>
 <footer th:fragment="footer" class="py-5 text-center text-body-secondary bg-body-tertiary">
     <p>Blog template built for <a href="https://getbootstrap.com/">Bootstrap</a> by <a href="https://twitter.com/mdo">@mdo</a>.
     </p>

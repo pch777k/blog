@@ -13,7 +13,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-
 @ControllerAdvice
 public class CustomGlobalExceptionHandler {
 
@@ -50,25 +49,5 @@ public class CustomGlobalExceptionHandler {
         body.put(ERROR, ex.getMessage());
         return new ResponseEntity<>(body, status);
     }
-//    @ExceptionHandler(EntityNotFoundException.class)
-//    public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex) {
-//        Map<String, Object> body = new LinkedHashMap<>();
-//        HttpStatus status = HttpStatus.NOT_FOUND;
-//        body.put(TIMESTAMP, new Date());
-//        body.put(STATUS, status.value());
-//        body.put(ERROR, ex.getMessage());
-//        return new ResponseEntity<>(body, status);
-//    }
-//
-//    @ExceptionHandler(EntityExistsException.class)
-//    public ResponseEntity<Object> handleEntityNotFoundException(EntityExistsException ex) {
-//        Map<String, Object> body = new LinkedHashMap<>();
-//        HttpStatus status = HttpStatus.CONFLICT;
-//        body.put(TIMESTAMP, new Date());
-//        body.put(STATUS, status.value());
-//        body.put(ERROR, ex.getMessage());
-//        return new ResponseEntity<>(body, status);
-//    }
-
 
 }
