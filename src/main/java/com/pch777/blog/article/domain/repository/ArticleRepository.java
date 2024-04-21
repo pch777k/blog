@@ -17,11 +17,14 @@ public interface ArticleRepository extends JpaRepository<Article, UUID> {
     Optional<Article> findByTitleUrl(String titleUrl);
     Page<Article> findByTitleContainingIgnoreCase(String title, Pageable pageable);
     Page<Article> findByCategoryId(UUID id, Pageable pageable);
+    Page<Article> findByCategoryNameIgnoreCase(String categoryName, Pageable pageable);
     Page<Article> findByTagsId(UUID tagId, Pageable pageable);
+
+    Page<Article> findByTagsName(String tagName, Pageable pageable);
     Page<Article> findByCreatedBetween(LocalDateTime startDateTime, LocalDateTime endDateTime, Pageable pageable);
 
     @Query(value = """
-            SELECT a.id, a.title, a.title_url, a.content, a.image_url, a.time_to_read, a.category_id, a.created, a.modified, ast.views
+            SELECT a.id, a.title, a.title_url, a.content, a.image_url, a.category_id, a.created, a.modified, ast.views
             FROM articles a
             JOIN article_stats ast ON a.id = ast.article_id
             ORDER BY ast.views DESC
@@ -29,5 +32,7 @@ public interface ArticleRepository extends JpaRepository<Article, UUID> {
             """,
     nativeQuery = true)
     List<Article> findTop3ArticlesOrderByViewsDesc();
+
+
 
 }

@@ -20,11 +20,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
-@Entity
-@Table(name = "articles")
+@Entity(name = "articles")
 public class Article {
-
-    public static final int WORDS_PER_MINUTE = 200;
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -40,9 +37,6 @@ public class Article {
 
     @Column(name = "image_url")
     private String imageUrl;
-
-    @Column(name = "time_to_read")
-    private int timeToRead;
 
     @ManyToMany(mappedBy = "articles", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JsonIgnoreProperties("articles")
@@ -63,47 +57,11 @@ public class Article {
     void prePersist() {
         this.created = LocalDateTime.now();
         this.modified = LocalDateTime.now();
-        this.titleUrl = generateUrlFromTitleAndId(this.title, this.id);
-        calculateTimeToRead();
     }
 
     @PreUpdate
     void preUpdate() {
-        modified = LocalDateTime.now();
-        this.titleUrl = generateUrlFromTitleAndId(this.title, this.id);
-        calculateTimeToRead();
-    }
-
-    private String generateUrlFromTitleAndId(String title, UUID id) {
-        String idSuffix = id.toString().substring(id.toString().length() - 6);
-        title = title.trim() + "-" + idSuffix;
-        title = replacePolishCharactersAndConvertToLowerCase(title);
-        return title.replaceAll("\\s+", "-");
-    }
-
-    private String replacePolishCharactersAndConvertToLowerCase(String text) {
-        text = text.toLowerCase()
-                .replace("ą", "a")
-                .replace("ć", "c")
-                .replace("ę", "e")
-                .replace("ł", "l")
-                .replace("ń", "n")
-                .replace("ó", "o")
-                .replace("ś", "s")
-                .replace("ź", "z")
-                .replace("ż", "z");
-        return text;
-    }
-
-    public void calculateTimeToRead() {
-        int totalWords = calculateTotalWords();
-        this.timeToRead = (int) Math.ceil((double) totalWords / WORDS_PER_MINUTE);
-    }
-
-    private int calculateTotalWords() {
-        String fullContent = this.title + " " + this.content;
-        String[] words = fullContent.split("\\s+");
-        return words.length;
+        this.modified = LocalDateTime.now();
     }
 
     public void addTag(Tag tag) {
@@ -122,10 +80,9 @@ public class Article {
         tags.clear();
     }
 
-    public Article addComment(Comment comment) {
+    public void addComment(Comment comment) {
         comment.setArticle(this);
         comments.add(comment);
-        return this;
     }
 
 }

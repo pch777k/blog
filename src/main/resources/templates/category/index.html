@@ -13,7 +13,7 @@
             </h3>
             <div th:replace="~{template :: articles-display(articles = ${summaryArticlesPage})}"></div>
 
-            <th:block th:replace="~{template :: pagination-articles(href='/categories/' + ${activeCategoryId},
+            <th:block th:replace="~{template :: pagination-articles(href='/categories/' + ${categoryName} + '/articles',
                     currentPage=${currentPageNumber},
                     totalPages=${totalPagesNumber},
                     search=null,

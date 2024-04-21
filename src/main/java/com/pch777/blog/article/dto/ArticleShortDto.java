@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @AllArgsConstructor
-public class ShortArticleDto {
+public class ArticleShortDto {
     private String title;
     private String titleUrl;
     private String imageUrl;

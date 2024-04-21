@@ -3,16 +3,16 @@ package com.pch777.blog.article.service;
 import com.pch777.blog.article.domain.model.Article;
 import com.pch777.blog.article.domain.model.ArticleStats;
 import com.pch777.blog.article.dto.ArticleDto;
-import com.pch777.blog.article.dto.ShortArticleDto;
-import com.pch777.blog.article.dto.SummaryArticleDto;
+import com.pch777.blog.article.dto.ArticleShortDto;
+import com.pch777.blog.article.dto.ArticleSummaryDto;
 import com.pch777.blog.category.domain.model.Category;
 import com.pch777.blog.category.service.CategoryService;
 import com.pch777.blog.comment.service.CommentService;
+import com.pch777.blog.common.configuration.BlogConfiguration;
 import com.pch777.blog.tag.domain.model.Tag;
 import com.pch777.blog.tag.dto.TagDto;
 import com.pch777.blog.tag.service.TagService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -22,12 +22,11 @@ import java.util.List;
 @Component
 public class ArticleMapper {
 
-    @Value("${article.shortContent.maxlength}")
-    private int maxShortContentLength;
     private final ArticleStatsService articleStatsService;
     private final CategoryService categoryService;
     private final TagService tagService;
     private final CommentService commentService;
+    private final BlogConfiguration blogConfiguration;
 
     public Article mapToArticle(Article article, ArticleDto articleDto) {
         Category category = categoryService.getCategoryById(articleDto.getCategoryId());
@@ -71,12 +70,12 @@ public class ArticleMapper {
                 .build();
     }
 
-    public SummaryArticleDto mapToSummaryArticleDto(Article article) {
+    public ArticleSummaryDto mapToArticleSummaryDto(Article article) {
         ArticleStats articleStats = articleStatsService.getArticleStatsByArticleId(article.getId());
-        String shortContent = shortenContent(article.getContent(), maxShortContentLength);
+        String shortContent = shortenContent(article.getContent(), blogConfiguration.getArticleShortContentLength());
         int totalComments = commentService.getComments(article.getId()).size();
 
-        return SummaryArticleDto.builder()
+        return ArticleSummaryDto.builder()
                 .id(article.getId())
                 .title(article.getTitle())
                 .titleUrl(article.getTitleUrl())
@@ -85,15 +84,15 @@ public class ArticleMapper {
                 .categoryId(article.getCategory().getId())
                 .categoryName(article.getCategory().getName())
                 .created(article.getCreated())
-                .timeToRead(article.getTimeToRead())
+                .timeToRead(articleStats.getTimeToRead())
                 .likes(articleStats.getLikes())
                 .views(articleStats.getViews())
                 .totalComments(totalComments)
                 .build();
     }
 
-    public ShortArticleDto mapToShortArticleDto(Article article) {
-        return ShortArticleDto.builder()
+    public ArticleShortDto mapToArticleShortDto(Article article) {
+        return ArticleShortDto.builder()
                 .title(article.getTitle())
                 .titleUrl(article.getTitleUrl())
                 .imageUrl(article.getImageUrl())

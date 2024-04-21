@@ -1,6 +1,6 @@
 package com.pch777.blog.tag.controller;
 
-import com.pch777.blog.article.dto.SummaryArticleDto;
+import com.pch777.blog.article.dto.ArticleSummaryDto;
 import com.pch777.blog.article.service.ArticleService;
 import com.pch777.blog.tag.domain.model.Tag;
 import com.pch777.blog.tag.dto.TagDto;
@@ -11,7 +11,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,10 +35,10 @@ public class TagApiController {
     }
 
     @GetMapping("{id}/articles")
-    public Page<SummaryArticleDto> getSummaryArticlesByTagId(@PathVariable UUID id,
-                            @RequestParam(name = "field", required = false, defaultValue = "created") String field,
-                            @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-                            @RequestParam(name = "size", required = false, defaultValue = "2") int size
+    public Page<ArticleSummaryDto> getSummaryArticlesByTagId(@PathVariable UUID id,
+                                                             @RequestParam(name = "field", required = false, defaultValue = "created") String field,
+                                                             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
+                                                             @RequestParam(name = "size", required = false, defaultValue = "2") int size
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(field));
 

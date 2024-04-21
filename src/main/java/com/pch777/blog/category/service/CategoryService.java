@@ -27,6 +27,12 @@ public class CategoryService {
                 .orElseThrow(() -> new EntityNotFoundException("Category not found with id: " + id));
     }
 
+    @Transactional(readOnly = true)
+    public Category getCategoryByName(String name) {
+        return categoryRepository.findByNameIgnoreCase(name)
+                .orElseThrow(() -> new EntityNotFoundException("Category not found with name: " + name));
+    }
+
     @Transactional
     public Category createCategory(Category categoryRequest) {
         Category category = new Category();

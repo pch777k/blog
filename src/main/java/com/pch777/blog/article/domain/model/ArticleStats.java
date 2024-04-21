@@ -17,6 +17,7 @@ public class ArticleStats {
 
     private int views;
     private int likes;
+    private int timeToRead;
 
     @OneToOne
     private Article article;
@@ -24,6 +25,7 @@ public class ArticleStats {
     public ArticleStats() {
         this.views = 0;
         this.likes = 0;
+        this.timeToRead = 0;
     }
 
 }

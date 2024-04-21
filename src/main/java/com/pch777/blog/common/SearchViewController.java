@@ -1,8 +1,9 @@
 package com.pch777.blog.common;
 
-import com.pch777.blog.article.dto.SummaryArticleDto;
+import com.pch777.blog.article.dto.ArticleSummaryDto;
 import com.pch777.blog.article.service.ArticleService;
 import com.pch777.blog.category.service.CategoryService;
+import com.pch777.blog.common.configuration.BlogConfiguration;
 import com.pch777.blog.tag.service.TagService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,10 +21,13 @@ import static com.pch777.blog.common.ControllerUtils.paging;
 @RequestMapping("/search")
 public class SearchViewController extends BlogCommonViewController {
 
+    private final BlogConfiguration blogConfiguration;
     public SearchViewController(CategoryService categoryService,
                                 ArticleService articleService,
-                                TagService tagService) {
+                                TagService tagService,
+                                BlogConfiguration blogConfiguration) {
         super(categoryService, articleService, tagService);
+        this.blogConfiguration = blogConfiguration;
     }
 
     @GetMapping
@@ -31,18 +35,17 @@ public class SearchViewController extends BlogCommonViewController {
             @RequestParam(name = "s", required = false) String search,
             @RequestParam(name = "field", required = false, defaultValue = "created") String field,
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
-            @RequestParam(name = "size", required = false, defaultValue = "2") int size,
             Model model
     ){
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(field).descending());
-        Page<SummaryArticleDto> summaryArticlesPage =  articleService.getSummaryArticles(search, pageable);
+        Pageable pageable = PageRequest.of(page, blogConfiguration.getPageSize(), Sort.by(field).descending());
+        Page<ArticleSummaryDto> summaryArticlesPage =  articleService.getSummaryArticles(search, pageable);
 
         model.addAttribute("summaryArticlesPage", summaryArticlesPage);
         model.addAttribute("search", search);
 
         addGlobalAttributes(model);
-        paging(model, summaryArticlesPage, size);
+        paging(model, summaryArticlesPage, blogConfiguration.getPageSize());
 
         return "search/index";
     }

@@ -17,18 +17,18 @@
                     <div class="card shadow-sm mb-4">
                         <img th:src="@{${article.imageUrl}}" class="card-img-top" height="400" alt="...">
                         <div class="card-body">
-                            <a th:href="@{'/categories/'+ ${article.category.id}}">
+                            <a th:href="@{'/categories/'+ ${#strings.toLowerCase(article.category.name)} + '/articles'}">
                                 <strong th:text="${article.category.name}"
                                         class="d-inline-block mb-2 text-success-emphasis">Category</strong>
                             </a>
                             <h3 th:text="${article.title}" class="mb-0">Post title</h3>
                             <small> <span class="mb-1 text-body-secondary"
-                                  th:text="${#temporals.format(article.created, 'MMM dd, yyyy')} + ' · ' + ${article.timeToRead} + ' min read'">created · time to read</span>
+                                  th:text="${#temporals.format(article.created, 'MMM dd, yyyy')} + ' · ' + ${articleStats.timeToRead} + ' min read'">created · time to read</span>
                             </small>
                             <p th:text="${article.content}" class="card-text">Article content</p>
                             <div th:unless="${article.tags.isEmpty()}" class="pt-3 mb-2">
                                 tags: <span th:each="tag, it : ${article.tags}">
-                                         #<a th:href="@{'/tags/'+ ${tag.id}}" th:text="${tag.name}"></a>
+                                         #<a th:href="@{'/tags/'+ ${tag.name} + '/articles'}" th:text="${tag.name}"></a>
                                         <span th:if="${!it.last}">, </span>
                                         </span>
                             </div>
@@ -90,13 +90,13 @@
                 <div id="commentsContainer" class="list-group my-3 mx-0">
                     <div th:each="comment : ${commentsPage}"
                          class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
-                        <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/img%20(23).webp" alt="twbs" width="32" height="32"
+                        <img src="https://picsum.photos/id/881/200/300" alt="twbs" width="32" height="32"
                              class="rounded-circle flex-shrink-0">
 
                         <div class="d-flex gap-2 w-100 justify-content-between">
                             <div>
                                 <h6 class="mb-0">John Doe</h6>
-                                <p th:text="${comment.content}" class="mb-0 opacity-75">Comment content</p>
+                                <p th:text="${comment.content}" class="mb-0 opacity-75" style="word-wrap: break-word; width: 35vw;">Comment content</p>
                             </div>
                             <small th:text="${#temporals.format(comment.created, 'MMM dd, yyyy')}" class="opacity-50 text-nowrap">now</small>
                         </div>
@@ -199,7 +199,6 @@
     //             return response.text();
     //         })
     //         .then(function (text) {
-    //             console.log("Odpowiedź serwera:", text);
     //             let commentData = JSON.parse(text);
     //
     //             let newCommentDiv = document.createElement("div");

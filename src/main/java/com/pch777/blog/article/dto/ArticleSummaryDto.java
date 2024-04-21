@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Data
 @Builder
-public class SummaryArticleDto {
+public class ArticleSummaryDto {
 
     private UUID id;
 
