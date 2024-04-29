@@ -1,4 +1,4 @@
-package com.pch777.blog.common;
+package com.pch777.blog.common.controller;
 
 import com.pch777.blog.article.dto.ArticleSummaryDto;
 import com.pch777.blog.article.service.ArticleService;
@@ -15,39 +15,37 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import static com.pch777.blog.common.ControllerUtils.paging;
+import static com.pch777.blog.common.controller.ControllerUtils.paging;
+
 
 @Controller
-@RequestMapping("/search")
-public class SearchViewController extends BlogCommonViewController {
+@RequestMapping("/")
+public class IndexViewController extends BlogCommonViewController {
 
     private final BlogConfiguration blogConfiguration;
-    public SearchViewController(CategoryService categoryService,
-                                ArticleService articleService,
-                                TagService tagService,
-                                BlogConfiguration blogConfiguration) {
+
+    public IndexViewController(CategoryService categoryService,
+                                 ArticleService articleService,
+                                 TagService tagService,
+                                 BlogConfiguration blogConfiguration) {
         super(categoryService, articleService, tagService);
         this.blogConfiguration = blogConfiguration;
     }
 
     @GetMapping
-    public String searchView(
-            @RequestParam(name = "s", required = false) String search,
-            @RequestParam(name = "field", required = false, defaultValue = "created") String field,
+    public String indexView(
             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
             Model model
-    ){
+    ) {
 
-        Pageable pageable = PageRequest.of(page, blogConfiguration.getPageSize(), Sort.by(field).descending());
-        Page<ArticleSummaryDto> summaryArticlesPage =  articleService.getSummaryArticles(search, pageable);
-
+        Pageable pageable = PageRequest.of(page,
+                blogConfiguration.getArticlesPageSize(),
+                Sort.by(blogConfiguration.getArticleSortField()).descending());
+        Page<ArticleSummaryDto> summaryArticlesPage = articleService.getSummaryArticles(pageable);
         model.addAttribute("summaryArticlesPage", summaryArticlesPage);
-        model.addAttribute("search", search);
-
         addGlobalAttributes(model);
-        paging(model, summaryArticlesPage, blogConfiguration.getPageSize());
+        paging(model, summaryArticlesPage, blogConfiguration.getArticlesPageSize());
 
-        return "search/index";
+        return "index/index";
     }
-
 }

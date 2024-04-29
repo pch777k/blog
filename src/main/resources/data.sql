@@ -1,3 +1,13 @@
+insert into roles (id, name, description)
+values (gen_random_uuid(), 'READER', 'Reader - default user role'),
+       (gen_random_uuid(), 'AUTHOR', 'Author role'),
+       (gen_random_uuid(), 'ADMIN', 'Administrator role');
+
+insert into authors (id, username, password, email, bio, role_id)
+values (gen_random_uuid(), 'author', '$2b$10$YC5BaT2zhISVL8Syo3AAZeh/12IuBki0KUy1FdVdWYpERc3obFjU2', 'author@mail.com',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+        (select id from roles where name = 'AUTHOR'));
+
 insert into categories (id, name)
 values (gen_random_uuid(), 'World'),
        (gen_random_uuid(), 'U.S.'),
@@ -12,7 +22,7 @@ values (gen_random_uuid(), 'World'),
        (gen_random_uuid(), 'Style'),
        (gen_random_uuid(), 'Travel');
 
-insert into articles (id, title, title_url, content, image_url, category_id, created, modified)
+insert into articles (id, title, title_url, content, image_url, category_id, author_id, created, modified)
 values (gen_random_uuid(),
         'Knowledge of human nature is the beginning and end of political education.',
         'knowledge',
@@ -25,6 +35,7 @@ values (gen_random_uuid(),
         'and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.',
         'https://picsum.photos/id/14/300/200',
         (select id from categories where name = 'Technology'),
+        (select id from authors where username = 'author'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -40,6 +51,7 @@ values (gen_random_uuid(),
         'and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.',
         'https://picsum.photos/id/24/300/200',
         (select id from categories where name = 'Travel'),
+        (select id from authors where username = 'author'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -55,6 +67,7 @@ values (gen_random_uuid(),
         'and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.',
         'https://picsum.photos/id/34/300/200',
         (select id from categories where name = 'Design'),
+        (select id from authors where username = 'author'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -70,6 +83,7 @@ values (gen_random_uuid(),
         'and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.',
         'https://picsum.photos/id/44/300/200',
         (select id from categories where name = 'Travel'),
+        (select id from authors where username = 'author'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -85,6 +99,7 @@ values (gen_random_uuid(),
         'and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.',
         'https://picsum.photos/id/54/300/200',
         (select id from categories where name = 'Travel'),
+        (select id from authors where username = 'author'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -100,6 +115,7 @@ values (gen_random_uuid(),
         'and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.',
         'https://picsum.photos/id/64/300/200',
         (select id from categories where name = 'Technology'),
+        (select id from authors where username = 'author'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -115,6 +131,7 @@ values (gen_random_uuid(),
         'and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.',
         'https://picsum.photos/id/74/300/200',
         (select id from categories where name = 'Travel'),
+        (select id from authors where username = 'author'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -130,6 +147,7 @@ values (gen_random_uuid(),
         'and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.',
         'https://picsum.photos/id/84/300/200',
         (select id from categories where name = 'Design'),
+        (select id from authors where username = 'author'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -145,6 +163,7 @@ values (gen_random_uuid(),
         'and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.',
         'https://picsum.photos/id/94/300/200',
         (select id from categories where name = 'Travel'),
+        (select id from authors where username = 'author'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -160,6 +179,7 @@ values (gen_random_uuid(),
         'and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.',
         'https://picsum.photos/id/99/300/200',
         (select id from categories where name = 'Technology'),
+        (select id from authors where username = 'author'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -170,6 +190,7 @@ values (gen_random_uuid(),
         'voluptatem accusantium doloremque laudantium.',
         'https://picsum.photos/id/1015/300/200',
         (select id from categories where name = 'World'),
+        (select id from authors where username = 'author'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -179,6 +200,7 @@ values (gen_random_uuid(),
         'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.',
         'https://picsum.photos/id/1020/300/200',
         (select id from categories where name = 'U.S.'),
+        (select id from authors where username = 'author'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -188,6 +210,7 @@ values (gen_random_uuid(),
         'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
         'https://picsum.photos/id/925/300/200',
         (select id from categories where name = 'Technology'),
+        (select id from authors where username = 'author'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -197,6 +220,7 @@ values (gen_random_uuid(),
         'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
         'https://picsum.photos/id/930/300/200',
         (select id from categories where name = 'Design'),
+        (select id from authors where username = 'author'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -206,6 +230,7 @@ values (gen_random_uuid(),
         'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
         'https://picsum.photos/id/1035/300/200',
         (select id from categories where name = 'Culture'),
+        (select id from authors where username = 'author'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -215,6 +240,7 @@ values (gen_random_uuid(),
         'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
         'https://picsum.photos/id/1040/300/200',
         (select id from categories where name = 'Business'),
+        (select id from authors where username = 'author'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -224,6 +250,7 @@ values (gen_random_uuid(),
         'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
         'https://picsum.photos/id/1045/300/200',
         (select id from categories where name = 'Politics'),
+        (select id from authors where username = 'author'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -233,6 +260,7 @@ values (gen_random_uuid(),
         'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
         'https://picsum.photos/id/1050/300/200',
         (select id from categories where name = 'Opinion'),
+        (select id from authors where username = 'author'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -242,6 +270,7 @@ values (gen_random_uuid(),
         'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
         'https://picsum.photos/id/1055/300/200',
         (select id from categories where name = 'Science'),
+        (select id from authors where username = 'author'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -251,6 +280,7 @@ values (gen_random_uuid(),
         'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
         'https://picsum.photos/id/1060/300/200',
         (select id from categories where name = 'Health'),
+        (select id from authors where username = 'author'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -260,6 +290,7 @@ values (gen_random_uuid(),
         'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
         'https://picsum.photos/id/1065/300/200',
         (select id from categories where name = 'Style'),
+        (select id from authors where username = 'author'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -269,32 +300,53 @@ values (gen_random_uuid(),
         'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
         'https://picsum.photos/id/1070/300/200',
         (select id from categories where name = 'Travel'),
+        (select id from authors where username = 'author'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now());
 
 insert into article_stats (id, likes, views, time_to_read, article_id)
 values (gen_random_uuid(), 5, 10, 0, (select id from articles where image_url = 'https://picsum.photos/id/14/300/200')),
-       (gen_random_uuid(), 11, 54, 0, (select id from articles where image_url = 'https://picsum.photos/id/24/300/200')),
-       (gen_random_uuid(), 21, 77, 0, (select id from articles where image_url = 'https://picsum.photos/id/34/300/200')),
-       (gen_random_uuid(), 52, 92, 0, (select id from articles where image_url = 'https://picsum.photos/id/44/300/200')),
-       (gen_random_uuid(), 33, 48, 0, (select id from articles where image_url = 'https://picsum.photos/id/54/300/200')),
-       (gen_random_uuid(), 20, 67, 0, (select id from articles where image_url = 'https://picsum.photos/id/64/300/200')),
-       (gen_random_uuid(), 19, 70, 0, (select id from articles where image_url = 'https://picsum.photos/id/74/300/200')),
-       (gen_random_uuid(), 41, 99, 0, (select id from articles where image_url = 'https://picsum.photos/id/84/300/200')),
+       (gen_random_uuid(), 11, 54, 0,
+        (select id from articles where image_url = 'https://picsum.photos/id/24/300/200')),
+       (gen_random_uuid(), 21, 77, 0,
+        (select id from articles where image_url = 'https://picsum.photos/id/34/300/200')),
+       (gen_random_uuid(), 52, 92, 0,
+        (select id from articles where image_url = 'https://picsum.photos/id/44/300/200')),
+       (gen_random_uuid(), 33, 48, 0,
+        (select id from articles where image_url = 'https://picsum.photos/id/54/300/200')),
+       (gen_random_uuid(), 20, 67, 0,
+        (select id from articles where image_url = 'https://picsum.photos/id/64/300/200')),
+       (gen_random_uuid(), 19, 70, 0,
+        (select id from articles where image_url = 'https://picsum.photos/id/74/300/200')),
+       (gen_random_uuid(), 41, 99, 0,
+        (select id from articles where image_url = 'https://picsum.photos/id/84/300/200')),
        (gen_random_uuid(), 3, 11, 0, (select id from articles where image_url = 'https://picsum.photos/id/94/300/200')),
-       (gen_random_uuid(), 17, 38, 0, (select id from articles where image_url = 'https://picsum.photos/id/99/300/200')),
-       (gen_random_uuid(), 22, 50, 0, (select id from articles where image_url = 'https://picsum.photos/id/1015/300/200')),
-       (gen_random_uuid(), 9, 36, 0, (select id from articles where image_url = 'https://picsum.photos/id/1020/300/200')),
-       (gen_random_uuid(), 15, 47, 0, (select id from articles where image_url = 'https://picsum.photos/id/925/300/200')),
-       (gen_random_uuid(), 6, 15, 0, (select id from articles where image_url = 'https://picsum.photos/id/930/300/200')),
-       (gen_random_uuid(), 1, 20, 0, (select id from articles where image_url = 'https://picsum.photos/id/1035/300/200')),
-       (gen_random_uuid(), 32, 68, 0, (select id from articles where image_url = 'https://picsum.photos/id/1040/300/200')),
-       (gen_random_uuid(), 27, 59, 0, (select id from articles where image_url = 'https://picsum.photos/id/1045/300/200')),
-       (gen_random_uuid(), 8, 81, 0, (select id from articles where image_url = 'https://picsum.photos/id/1050/300/200')),
-       (gen_random_uuid(), 33, 72, 0, (select id from articles where image_url = 'https://picsum.photos/id/1055/300/200')),
-       (gen_random_uuid(), 14, 39, 0, (select id from articles where image_url = 'https://picsum.photos/id/1060/300/200')),
-       (gen_random_uuid(), 25, 45, 0, (select id from articles where image_url = 'https://picsum.photos/id/1065/300/200')),
-       (gen_random_uuid(), 35, 68, 0, (select id from articles where image_url = 'https://picsum.photos/id/1070/300/200'));
+       (gen_random_uuid(), 17, 38, 0,
+        (select id from articles where image_url = 'https://picsum.photos/id/99/300/200')),
+       (gen_random_uuid(), 22, 50, 0,
+        (select id from articles where image_url = 'https://picsum.photos/id/1015/300/200')),
+       (gen_random_uuid(), 9, 36, 0,
+        (select id from articles where image_url = 'https://picsum.photos/id/1020/300/200')),
+       (gen_random_uuid(), 15, 47, 0,
+        (select id from articles where image_url = 'https://picsum.photos/id/925/300/200')),
+       (gen_random_uuid(), 6, 15, 0,
+        (select id from articles where image_url = 'https://picsum.photos/id/930/300/200')),
+       (gen_random_uuid(), 1, 20, 0,
+        (select id from articles where image_url = 'https://picsum.photos/id/1035/300/200')),
+       (gen_random_uuid(), 32, 68, 0,
+        (select id from articles where image_url = 'https://picsum.photos/id/1040/300/200')),
+       (gen_random_uuid(), 27, 59, 0,
+        (select id from articles where image_url = 'https://picsum.photos/id/1045/300/200')),
+       (gen_random_uuid(), 8, 81, 0,
+        (select id from articles where image_url = 'https://picsum.photos/id/1050/300/200')),
+       (gen_random_uuid(), 33, 72, 0,
+        (select id from articles where image_url = 'https://picsum.photos/id/1055/300/200')),
+       (gen_random_uuid(), 14, 39, 0,
+        (select id from articles where image_url = 'https://picsum.photos/id/1060/300/200')),
+       (gen_random_uuid(), 25, 45, 0,
+        (select id from articles where image_url = 'https://picsum.photos/id/1065/300/200')),
+       (gen_random_uuid(), 35, 68, 0,
+        (select id from articles where image_url = 'https://picsum.photos/id/1070/300/200'));
 
 insert into tags (id, name)
 values (gen_random_uuid(), 'asia'),
@@ -340,23 +392,23 @@ values ((select id from articles where image_url = 'https://picsum.photos/id/14/
        ((select id from articles where image_url = 'https://picsum.photos/id/99/300/200'),
         (select id from tags where name = 'music'));
 
-insert into comments (id, article_id, content, created, modified)
+insert into comments (id, article_id, user_id, content, created, modified)
 values (gen_random_uuid(),
         (select id from articles where image_url = 'https://picsum.photos/id/14/300/200'),
+        (select id from authors where username = 'author'),
         'comment', now(), now());
 
 
 update articles
 set title_url = CONCAT(REPLACE(LOWER(CONCAT(title, '-', RIGHT(id::text, 6))), ' ', '-'));
 
-INSERT INTO comments (id, article_id, content, created, modified)
-SELECT
-    gen_random_uuid(),
-    a.id,
-    'Random comment for article ' || a.title_url,
-    NOW(),
-    NOW()
-FROM
-    articles a
-        CROSS JOIN LATERAL generate_series(1, 10) s
+INSERT INTO comments (id, article_id, user_id, content, created, modified)
+SELECT gen_random_uuid(),
+       a.id,
+       (select id from authors where username = 'author'),
+       'Random comment for article ' || a.title_url,
+       NOW(),
+       NOW()
+FROM articles a
+         CROSS JOIN LATERAL generate_series(1, 10) s
 

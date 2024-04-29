@@ -6,6 +6,7 @@ import com.pch777.blog.article.dto.ArticleShortDto;
 import com.pch777.blog.article.dto.ArticleSummaryDto;
 import com.pch777.blog.article.service.ArticleService;
 import com.pch777.blog.common.configuration.BlogConfiguration;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,7 +32,7 @@ public class ArticleApiController {
                         @RequestParam(name = "field", required = false, defaultValue = "created") String field,
                         @RequestParam(name = "page", required = false, defaultValue = "0") int page
     ) {
-        Pageable pageable = PageRequest.of(page, blogConfiguration.getPageSize(), Sort.by(field).descending());
+        Pageable pageable = PageRequest.of(page, blogConfiguration.getArticlesPageSize(), Sort.by(field).descending());
         return articleService.getSummaryArticles(pageable);
     }
 
@@ -46,14 +48,14 @@ public class ArticleApiController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Article createArticle(@RequestBody ArticleDto articleDto) {
-        return articleService.createArticle(articleDto);
+    public Article createArticle(@Valid @RequestBody ArticleDto articleDto, Principal principal) {
+        return articleService.createArticleByAuthor(articleDto, principal.getName());
     }
 
     @PutMapping("{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public Article updateArticle(@PathVariable UUID id, @RequestBody ArticleDto articleDto) {
-        return articleService.updateArticle(id, articleDto);
+    public Article updateArticle(@PathVariable UUID id, @Valid @RequestBody ArticleDto articleDto, Principal principal) {
+        return articleService.updateArticle(id, articleDto, principal.getName());
     }
 
     @DeleteMapping("{id}")

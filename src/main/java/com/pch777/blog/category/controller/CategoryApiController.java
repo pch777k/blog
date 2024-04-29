@@ -2,6 +2,7 @@ package com.pch777.blog.category.controller;
 
 import com.pch777.blog.category.domain.model.Category;
 import com.pch777.blog.category.service.CategoryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -28,13 +29,14 @@ public class CategoryApiController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Category createCategory(@RequestBody Category category) {
+    public Category createCategory(@Valid  @RequestBody Category category) {
         return categoryService.createCategory(category);
     }
 
     @PutMapping("{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public Category updateCategory(@PathVariable UUID id, @RequestBody Category category) {
+    public Category updateCategory(@PathVariable UUID id,
+                                   @Valid @RequestBody Category category) {
         return categoryService.updateCategory(id, category);
     }
 

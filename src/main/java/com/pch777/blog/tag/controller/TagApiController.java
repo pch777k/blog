@@ -5,6 +5,7 @@ import com.pch777.blog.article.service.ArticleService;
 import com.pch777.blog.tag.domain.model.Tag;
 import com.pch777.blog.tag.dto.TagDto;
 import com.pch777.blog.tag.service.TagService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -52,13 +53,13 @@ public class TagApiController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Tag createTag(@RequestBody TagDto tagDto) {
+    public Tag createTag(@Valid @RequestBody TagDto tagDto) {
         return tagService.createTag(tagDto);
     }
 
     @PutMapping("{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public Tag updateTag(@PathVariable UUID id, @RequestBody TagDto tagDto) {
+    public Tag updateTag(@PathVariable UUID id, @Valid @RequestBody TagDto tagDto) {
         return tagService.updateTag(id, tagDto);
     }
 

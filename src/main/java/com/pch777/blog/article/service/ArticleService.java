@@ -6,6 +6,10 @@ import com.pch777.blog.article.domain.repository.ArticleRepository;
 import com.pch777.blog.article.domain.repository.ArticleStatsRepository;
 import com.pch777.blog.article.dto.*;
 import com.pch777.blog.common.configuration.BlogConfiguration;
+import com.pch777.blog.user.domain.model.Author;
+import com.pch777.blog.user.domain.model.User;
+import com.pch777.blog.user.service.UserActivityService;
+import com.pch777.blog.user.service.UserService;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -19,29 +23,41 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static com.pch777.blog.user.domain.model.Operation.CREATE_ARTICLE;
+import static com.pch777.blog.user.domain.model.Operation.EDIT_ARTICLE;
+
 @RequiredArgsConstructor
 @Service
 public class ArticleService {
 
-    public static final String ARTICLE_NOT_FOUND_WITH_ID = "Article not found with id : ";
     private final ArticleRepository articleRepository;
     private final ArticleStatsRepository articleStatsRepository;
     private final ArticleMapper articleMapper;
     private final BlogConfiguration blogConfiguration;
     private final ArticleStatsService articleStatsService;
     private final ArticleUtilsService articleUtilsService;
+    private final UserService userService;
+    private final UserActivityService userActivityService;
 
 
     @Transactional(readOnly = true)
     public Article getArticleById(UUID id) {
+        return findArticleById(id);
+    }
+
+    public Article findArticleById(UUID id) {
         return articleRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Article not found with id: " + id));
     }
 
+    public Article findArticleByTitleUrl(String titleUrl) {
+        return articleRepository.findByTitleUrl(titleUrl)
+                .orElseThrow(() -> new EntityNotFoundException("Article not found with title : " + titleUrl));
+    }
+
     @Transactional
     public Article getArticleByTitleUrl(String titleUrl) {
-        Article article = articleRepository.findByTitleUrl(titleUrl)
-                .orElseThrow(() -> new EntityNotFoundException("Article not found with title : " + titleUrl));
+        Article article = findArticleByTitleUrl(titleUrl);
         articleStatsRepository.incrementViewsByArticleId(article.getId());
         return article;
     }
@@ -89,33 +105,41 @@ public class ArticleService {
     }
 
     @Transactional
-    public Article createArticle(ArticleDto articleDto) {
+    public Article createArticleByAuthor(ArticleDto articleDto, String username) {
+        User user = userService.getUserByUsername(username);
+        if (!(user instanceof Author author)) {
+            throw new IllegalArgumentException("User is not an author");
+        }
         Article article = articleRepository.save(articleMapper.mapToArticle(new Article(), articleDto));
         article.setTitleUrl(articleUtilsService.generateUrlFromTitleAndId(article.getTitle(), article.getId()));
+        article.setAuthor(author);
+        author.getArticles().add(article);
         ArticleStats articleStats = new ArticleStats();
         articleStats.setTimeToRead(articleStatsService.calculateTimeToRead(article.getTitle(), article.getContent()));
         articleStats.setArticle(article);
         articleStatsRepository.save(articleStats);
+        userActivityService.addArticleOperation(user, CREATE_ARTICLE, article);
         return article;
     }
 
     @Transactional
-    public Article updateArticle(UUID id, ArticleDto articleDto) {
-        Article article = articleRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ARTICLE_NOT_FOUND_WITH_ID + id));
-        ArticleStats articleStats = articleStatsRepository.findByArticleId(id)
-                .orElseThrow(() -> new EntityNotFoundException("ArticleStats not found for article with id : " + id));
+    public Article updateArticle(UUID id, ArticleDto articleDto, String username) {
+        User user = userService.getUserByUsername(username);
+        if (!(user instanceof Author)) {
+            throw new IllegalArgumentException("User is not an author");
+        }
+        Article article = findArticleById(id);
+        ArticleStats articleStats = articleStatsService.getArticleStatsByArticleId(id);
         articleStats.setTimeToRead(articleStatsService.calculateTimeToRead(articleDto.getTitle(), articleDto.getContent()));
         article.setTitleUrl(articleUtilsService.generateUrlFromTitleAndId(articleDto.getTitle(), id));
+        userActivityService.addArticleOperation(user, EDIT_ARTICLE, article);
         return articleMapper.mapToArticle(article, articleDto);
     }
 
     @Transactional
     public void deleteArticle(UUID id) {
-        Article article = articleRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ARTICLE_NOT_FOUND_WITH_ID + id));
-        ArticleStats articleStats = articleStatsRepository.findByArticleId(id)
-                .orElseThrow(() -> new EntityNotFoundException("ArticleStats not found for article with id : " + id));
+        Article article = findArticleById(id);
+        ArticleStats articleStats = articleStatsService.getArticleStatsByArticleId(id);
         articleStatsRepository.delete(articleStats);
         article.removeTags();
         articleRepository.delete(article);
@@ -123,17 +147,14 @@ public class ArticleService {
 
     @Transactional
     public void increaseLikes(UUID id) {
-        Article article = articleRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(ARTICLE_NOT_FOUND_WITH_ID + id));
-        articleStatsRepository.incrementLikesByArticleId(article.getId());
+        articleStatsRepository.incrementLikesByArticleId(findArticleById(id).getId());
     }
 
     @Transactional(readOnly = true)
     public ArticleNavigationDto getArticleNavigationDto(String titleUrl) {
         ArticleNavigationDto articleNavigationDto = new ArticleNavigationDto();
-        Article article = articleRepository.findByTitleUrl(titleUrl)
-                .orElseThrow(() -> new EntityNotFoundException("Article not found with title : " + titleUrl));
-        List<Article> articles = articleRepository.findAll(Sort.by("created"));
+        Article article = findArticleByTitleUrl(titleUrl);
+        List<Article> articles = articleRepository.findAll(Sort.by(blogConfiguration.getArticleSortField()));
         int currentIndex = articles.indexOf(article);
 
         int articlesSize = articles.size();

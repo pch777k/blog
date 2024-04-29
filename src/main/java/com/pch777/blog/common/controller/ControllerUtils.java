@@ -1,4 +1,4 @@
-package com.pch777.blog.common;
+package com.pch777.blog.common.controller;
 
 import org.springframework.data.domain.Page;
 import org.springframework.ui.Model;

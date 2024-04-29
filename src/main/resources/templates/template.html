@@ -13,6 +13,22 @@
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
+    <!-- Font Awesome -->
+    <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+            rel="stylesheet"
+    />
+    <!-- Google Fonts -->
+    <link
+            href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap"
+            rel="stylesheet"
+    />
+    <!-- MDB -->
+    <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.2.0/mdb.min.css"
+            rel="stylesheet"
+    />
+
     <style>
         .bd-placeholder-img {
             font-size: 1.125rem;
@@ -107,14 +123,15 @@
                 <a class="link-secondary" href="#">Subscribe</a>
             </div>
             <div class="col-4 text-center">
-                <a class="blog-header-logo text-body-emphasis text-decoration-none" href="/articles">Blog</a>
+                <a class="blog-header-logo text-body-emphasis text-decoration-none" href="/">Blog</a>
             </div>
             <div class="col-2 text-center">
-                <a th:href="@{'/articles/add'}" class="btn btn-sm btn-outline-secondary">Add</a>
+                <a th:href="@{'/articles'}" class="btn btn-sm btn-outline-secondary">Add</a>
             </div>
             <div class="col-2 d-flex justify-content-end align-items-center">
-
-                <a class="btn btn-sm btn-outline-secondary" href="#">Sign up</a>
+                <a th:unless="${#authorization.expression('isAuthenticated()')}" class="btn btn-sm btn-outline-secondary" href="/login">Sign in</a>
+                <a th:if="${#authorization.expression('isAuthenticated()')}" class="btn btn-sm btn-outline-secondary" href="/logout">Log out</a>
+                <a th:unless="${#authorization.expression('isAuthenticated()')}" class="btn btn-sm btn-outline-secondary" href="#">Sign up</a>
             </div>
         </div>
     </header>

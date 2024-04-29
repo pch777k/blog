@@ -1,4 +1,4 @@
-package com.pch777.blog.common;
+package com.pch777.blog.common.controller;
 
 import com.pch777.blog.article.service.ArticleService;
 import com.pch777.blog.category.service.CategoryService;

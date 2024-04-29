@@ -2,6 +2,7 @@ package com.pch777.blog.comment.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pch777.blog.article.domain.model.Article;
+import com.pch777.blog.user.domain.model.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,9 +29,18 @@ public class Comment {
     @JsonIgnore
     private Article article;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    private User user;
+
     private LocalDateTime created;
 
     private LocalDateTime modified;
+
+    public Comment(String content, User user) {
+        this.content = content;
+        this.user = user;
+    }
 
     @PrePersist
     void prePersist() {

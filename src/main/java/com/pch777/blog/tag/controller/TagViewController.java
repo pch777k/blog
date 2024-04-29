@@ -3,7 +3,7 @@ package com.pch777.blog.tag.controller;
 import com.pch777.blog.article.dto.ArticleSummaryDto;
 import com.pch777.blog.article.service.ArticleService;
 import com.pch777.blog.category.service.CategoryService;
-import com.pch777.blog.common.BlogCommonViewController;
+import com.pch777.blog.common.controller.BlogCommonViewController;
 import com.pch777.blog.common.configuration.BlogConfiguration;
 import com.pch777.blog.tag.service.TagService;
 import org.springframework.data.domain.Page;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import static com.pch777.blog.common.ControllerUtils.paging;
+import static com.pch777.blog.common.controller.ControllerUtils.paging;
 
 @Controller
 @RequestMapping("/tags")
@@ -40,14 +40,14 @@ public class TagViewController extends BlogCommonViewController {
             Model model
     ) {
 
-        Pageable pageable = PageRequest.of(page, blogConfiguration.getPageSize(), Sort.by(field));
+        Pageable pageable = PageRequest.of(page, blogConfiguration.getArticlesPageSize(), Sort.by(field));
 
         Page<ArticleSummaryDto> summaryArticlesPage =  articleService.getSummaryArticlesByTagName(name, pageable);
         model.addAttribute("summaryArticlesPage", summaryArticlesPage);
         model.addAttribute("tagName", tagService.getTagByName(name).getName());
 
         addGlobalAttributes(model);
-        paging(model, summaryArticlesPage, blogConfiguration.getPageSize());
+        paging(model, summaryArticlesPage, blogConfiguration.getArticlesPageSize());
 
         return "tag/index";
     }

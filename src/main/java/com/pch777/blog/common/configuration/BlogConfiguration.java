@@ -18,9 +18,15 @@ public class BlogConfiguration {
     @Value("${blog.article.readSpeedWordsPerMinute}")
     private int readSpeedWordsPerMinute;
 
+    @Value("${blog.article.sortField}")
+    private String articleSortField;
+
     @Value("${blog.article.archive.numberOfLastMonths}")
     private int numberOfLastMonths;
 
-    @Value("${blog.paging.pageSize}")
-    private int pageSize;
+    @Value("${blog.article.paging.pageSize}")
+    private int articlesPageSize;
+
+    @Value("${blog.comment.paging.pageSize}")
+    private int commentsPageSize;
 }

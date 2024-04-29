@@ -1,10 +1,12 @@
 package com.pch777.blog.article.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.pch777.blog.category.domain.model.Category;
 import com.pch777.blog.comment.domain.model.Comment;
 import com.pch777.blog.tag.domain.model.Tag;
+import com.pch777.blog.user.domain.model.Author;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -45,6 +47,10 @@ public class Article {
     @JsonBackReference
     @ManyToOne
     private Category category;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
+    private Author author;
 
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Comment> comments = new HashSet<>();
