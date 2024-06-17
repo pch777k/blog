@@ -1,7 +1,7 @@
-package com.pch777.blog.user.controller;
+package com.pch777.blog.identity.author.controller;
 
-import com.pch777.blog.user.domain.model.Author;
-import com.pch777.blog.user.service.AuthorService;
+import com.pch777.blog.identity.author.domain.model.Author;
+import com.pch777.blog.identity.author.service.AuthorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

@@ -1,7 +1,7 @@
 package com.pch777.blog.security;
 
-import com.pch777.blog.user.domain.model.User;
-import com.pch777.blog.user.domain.repository.UserRepository;
+import com.pch777.blog.identity.user.domain.model.User;
+import com.pch777.blog.identity.user.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

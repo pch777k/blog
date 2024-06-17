@@ -104,14 +104,6 @@ public abstract class User {
     }
 
     public boolean hasPermission(PermissionType permission) {
-        System.out.println("Permission: " + permission);
-        permissions.stream().map(Permission::getPermissionType).forEach(System.out::println);
         return permissions.stream().anyMatch(p -> p.getPermissionType().equals(permission));
-//        boolean hasPerm = permissions.contains(permission);
-//        System.out.println("Checking permission: " + permission.getPermissionType() + " - " + hasPerm);
-//        System.out.println("Permission: " + permission);
-//
-//
-//        return hasPerm;
     }
 }

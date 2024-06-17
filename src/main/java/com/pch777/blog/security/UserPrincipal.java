@@ -1,15 +1,14 @@
 package com.pch777.blog.security;
 
-import com.pch777.blog.user.domain.model.User;
-import com.pch777.blog.user.role.Role;
+import com.pch777.blog.identity.permission.domain.model.Permission;
+import com.pch777.blog.identity.user.domain.model.User;
+import com.pch777.blog.identity.user.domain.model.Role;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @AllArgsConstructor
 public class UserPrincipal implements UserDetails {
@@ -18,7 +17,9 @@ public class UserPrincipal implements UserDetails {
     private String username;
     private String email;
     private String password;
-    private String role;
+    private transient Role role;
+    private transient Set<Permission> permissions;
+    private boolean isEnabled;
 
     public static UserPrincipal create(User user) {
         return new UserPrincipal(
@@ -26,14 +27,20 @@ public class UserPrincipal implements UserDetails {
                 user.getUsername(),
                 user.getEmail(),
                 user.getPassword(),
-                user.getRole().getName().toString()
+                user.getRole(),
+                user.getPermissions(),
+                user.isEnabled()
         );
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role);
-        return List.of(authority);
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + role.name()));
+        permissions.forEach(permission ->
+                authorities.add(new SimpleGrantedAuthority(permission.getPermissionType().name())));
+
+        return authorities;
     }
 
     @Override
@@ -63,6 +70,6 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.isEnabled;
     }
 }
