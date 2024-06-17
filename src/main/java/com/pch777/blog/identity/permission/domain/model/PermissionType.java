@@ -1,0 +1,42 @@
+package com.pch777.blog.identity.permission.domain.model;
+
+public enum PermissionType {
+    ARTICLE_READ,
+    ARTICLE_UPDATE,
+    ARTICLE_CREATE,
+    ARTICLE_DELETE,
+    ARTICLE_LIKE,
+
+    COMMENT_READ,
+    COMMENT_UPDATE,
+    COMMENT_CREATE,
+    COMMENT_DELETE,
+
+    TAG_READ,
+    TAG_UPDATE,
+    TAG_CREATE,
+    TAG_DELETE,
+
+    CATEGORY_READ,
+    CATEGORY_UPDATE,
+    CATEGORY_CREATE,
+    CATEGORY_DELETE,
+
+    PROFILE_READ,
+    PROFILE_UPDATE,
+    PROFILE_CREATE,
+    PROFILE_DELETE,
+
+    MESSAGE_SEND,
+    MESSAGE_RECEIVE,
+    USER_SUBSCRIBE,
+
+    USER_READ,
+    USER_CREATE,
+    USER_UPDATE,
+    USER_DELETE
+
+
+
+}
+
