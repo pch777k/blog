@@ -1,19 +1,19 @@
 package com.pch777.blog.identity.user.domain.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.pch777.blog.comment.domain.model.Comment;
 import com.pch777.blog.identity.permission.domain.model.Permission;
 import com.pch777.blog.identity.permission.domain.model.PermissionType;
 import com.pch777.blog.notification.domain.model.Notification;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.Formula;
 
 import java.time.LocalDateTime;
 import java.util.*;
 
+@ToString
 @Setter
 @Getter
 @NoArgsConstructor
@@ -35,6 +35,7 @@ public abstract class User {
     @Column(name = "username", unique = true, length = 50, nullable = false)
     private String username;
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "password")
     private String password;
 
@@ -49,12 +50,14 @@ public abstract class User {
     private LocalDateTime modified;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private Set<Comment> comments = new HashSet<>();
 
     @Formula("(SELECT COUNT(*) FROM comments s WHERE s.user_id = id)")
     private int commentCount;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private List<Notification> notifications = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
@@ -69,6 +72,7 @@ public abstract class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "permission_id")
     )
+    @JsonIgnore
     private Set<Permission> permissions = new HashSet<>();
 
     protected User(String firstName, String lastName, String username, String password, String email, Role role) {
