@@ -6,15 +6,17 @@ import com.pch777.blog.article.domain.repository.ArticleRepository;
 import com.pch777.blog.article.domain.repository.ArticleStatsRepository;
 import com.pch777.blog.article.dto.*;
 import com.pch777.blog.common.configuration.BlogConfiguration;
-import com.pch777.blog.user.domain.model.Author;
-import com.pch777.blog.user.domain.model.User;
-import com.pch777.blog.user.service.UserActivityService;
-import com.pch777.blog.user.service.UserService;
-import jakarta.persistence.EntityNotFoundException;
+import com.pch777.blog.exception.ArticleNotFoundException;
+import com.pch777.blog.exception.ForbiddenException;
+import com.pch777.blog.exception.UnauthorizedException;
+import com.pch777.blog.notification.domain.model.NotificationType;
+import com.pch777.blog.notification.service.NotificationService;
+import com.pch777.blog.identity.author.domain.model.Author;
+import com.pch777.blog.identity.user.domain.model.User;
+import com.pch777.blog.identity.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static com.pch777.blog.user.domain.model.Operation.CREATE_ARTICLE;
-import static com.pch777.blog.user.domain.model.Operation.EDIT_ARTICLE;
+import static com.pch777.blog.identity.user.domain.model.Role.ADMIN;
 
 @RequiredArgsConstructor
 @Service
@@ -37,27 +38,19 @@ public class ArticleService {
     private final ArticleStatsService articleStatsService;
     private final ArticleUtilsService articleUtilsService;
     private final UserService userService;
-    private final UserActivityService userActivityService;
+    private final NotificationService notificationService;
 
 
     @Transactional(readOnly = true)
     public Article getArticleById(UUID id) {
-        return findArticleById(id);
-    }
-
-    public Article findArticleById(UUID id) {
         return articleRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Article not found with id: " + id));
-    }
-
-    public Article findArticleByTitleUrl(String titleUrl) {
-        return articleRepository.findByTitleUrl(titleUrl)
-                .orElseThrow(() -> new EntityNotFoundException("Article not found with title : " + titleUrl));
+                .orElseThrow(() -> new ArticleNotFoundException(id));
     }
 
     @Transactional
     public Article getArticleByTitleUrl(String titleUrl) {
-        Article article = findArticleByTitleUrl(titleUrl);
+        Article article = articleRepository.findByTitleUrl(titleUrl)
+                .orElseThrow(() -> new ArticleNotFoundException(titleUrl));
         articleStatsRepository.incrementViewsByArticleId(article.getId());
         return article;
     }
@@ -77,6 +70,10 @@ public class ArticleService {
     public Page<ArticleSummaryDto> getSummaryArticlesByCategoryName(String categoryName, Pageable pageable) {
         Page<Article> articlesPage = articleRepository.findByCategoryNameIgnoreCase(categoryName, pageable);
         return articlesPage.map(articleMapper::mapToArticleSummaryDto);
+    }
+
+    public Page<ArticleAuthorPanelDto> getArticlesSummary(UUID authorId, String title, Pageable pageable) {
+        return articleRepository.findSummaryByAuthorIdAndTitle(authorId, title, pageable);
     }
 
     @Transactional(readOnly = true)
@@ -105,6 +102,7 @@ public class ArticleService {
     }
 
     @Transactional
+    @PreAuthorize("hasAnyRole('AUTHOR','ADMIN')")
     public Article createArticleByAuthor(ArticleDto articleDto, String username) {
         User user = userService.getUserByUsername(username);
         if (!(user instanceof Author author)) {
@@ -118,42 +116,49 @@ public class ArticleService {
         articleStats.setTimeToRead(articleStatsService.calculateTimeToRead(article.getTitle(), article.getContent()));
         articleStats.setArticle(article);
         articleStatsRepository.save(articleStats);
-        userActivityService.addArticleOperation(user, CREATE_ARTICLE, article);
+        notificationService.createNotification(author, "New article created", NotificationType.ARTICLE);
+        notificationService.createNotificationForSubscribers(article);
         return article;
     }
 
     @Transactional
+    @PreAuthorize("hasAnyRole('AUTHOR','ADMIN')")
     public Article updateArticle(UUID id, ArticleDto articleDto, String username) {
-        User user = userService.getUserByUsername(username);
-        if (!(user instanceof Author)) {
-            throw new IllegalArgumentException("User is not an author");
-        }
-        Article article = findArticleById(id);
+        Article article = validateAndProcessArticle(id, username);
         ArticleStats articleStats = articleStatsService.getArticleStatsByArticleId(id);
         articleStats.setTimeToRead(articleStatsService.calculateTimeToRead(articleDto.getTitle(), articleDto.getContent()));
         article.setTitleUrl(articleUtilsService.generateUrlFromTitleAndId(articleDto.getTitle(), id));
-        userActivityService.addArticleOperation(user, EDIT_ARTICLE, article);
         return articleMapper.mapToArticle(article, articleDto);
     }
 
     @Transactional
-    public void deleteArticle(UUID id) {
-        Article article = findArticleById(id);
+    @PreAuthorize("hasAnyRole('AUTHOR','ADMIN')")
+    public void deleteArticle(UUID id, String username) {
+        Article article = validateAndProcessArticle(id, username);
         ArticleStats articleStats = articleStatsService.getArticleStatsByArticleId(id);
         articleStatsRepository.delete(articleStats);
         article.removeTags();
         articleRepository.delete(article);
     }
 
-    @Transactional
-    public void increaseLikes(UUID id) {
-        articleStatsRepository.incrementLikesByArticleId(findArticleById(id).getId());
+    private Article validateAndProcessArticle(UUID articleId, String username) {
+        if(username == null) {
+            throw new UnauthorizedException("Unauthorized access");
+        }
+        User user = userService.getUserByUsername(username);
+        Article article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new ArticleNotFoundException(articleId));
+        if (!user.getId().equals(article.getAuthor().getId()) && !user.getRole().equals(ADMIN)) {
+            throw new ForbiddenException("Access denied");
+        }
+        return article;
     }
 
     @Transactional(readOnly = true)
     public ArticleNavigationDto getArticleNavigationDto(String titleUrl) {
         ArticleNavigationDto articleNavigationDto = new ArticleNavigationDto();
-        Article article = findArticleByTitleUrl(titleUrl);
+        Article article = articleRepository.findByTitleUrl(titleUrl)
+                .orElseThrow(() -> new ArticleNotFoundException(titleUrl));
         List<Article> articles = articleRepository.findAll(Sort.by(blogConfiguration.getArticleSortField()));
         int currentIndex = articles.indexOf(article);
 
@@ -169,6 +174,7 @@ public class ArticleService {
         return articleNavigationDto;
     }
 
+    @Transactional(readOnly = true)
     public List<ArticleArchiveDateDto> getNumberOfLastMonths() {
         List<ArticleArchiveDateDto> monthYearList = new ArrayList<>();
         LocalDate currentDate = LocalDate.now();
@@ -184,12 +190,11 @@ public class ArticleService {
         return monthYearList;
     }
 
+    @Transactional(readOnly = true)
     public List<ArticleShortDto> getTop3PopularArticles() {
         List<Article> articles = articleRepository.findTop3ArticlesOrderByViewsDesc();
         return articles.stream().map(articleMapper::mapToArticleShortDto).toList();
     }
-
-
 
 
 }

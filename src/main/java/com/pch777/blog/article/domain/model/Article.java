@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.pch777.blog.category.domain.model.Category;
 import com.pch777.blog.comment.domain.model.Comment;
 import com.pch777.blog.tag.domain.model.Tag;
-import com.pch777.blog.user.domain.model.Author;
+import com.pch777.blog.identity.author.domain.model.Author;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.JdbcTypeCode;
@@ -22,7 +22,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
-@Entity(name = "articles")
+@Entity
+@Table(name = "articles")
 public class Article {
 
     @Id
@@ -34,6 +35,7 @@ public class Article {
     @Column(name = "title_url")
     private String titleUrl;
 
+    @Column(length = 2147483647)
     @JdbcTypeCode(SqlTypes.LONGVARCHAR)
     private String content;
 
@@ -47,6 +49,9 @@ public class Article {
     @JsonBackReference
     @ManyToOne
     private Category category;
+
+    @OneToOne(mappedBy = "article", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+    private ArticleStats stats;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnore
