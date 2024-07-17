@@ -5,10 +5,7 @@ import com.pch777.blog.article.domain.model.Article;
 import com.pch777.blog.subscription.domain.model.Subscription;
 import com.pch777.blog.identity.user.domain.model.User;
 import com.pch777.blog.identity.user.domain.model.Role;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,7 +17,8 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@Entity(name = "authors")
+@Table(name = "authors")
+@Entity
 public class Author extends User {
 
     @Column(name = "bio")
@@ -30,11 +28,11 @@ public class Author extends User {
     @JsonIgnore
     private List<Article> articles;
 
-    @Formula("(SELECT COUNT(*) FROM articles s WHERE s.author_id = id)")
-    private int articleCount;
-
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Subscription> subscriptions = new ArrayList<>();
+
+    @Formula("(SELECT COUNT(*) FROM articles s WHERE s.author_id = id)")
+    private int articleCount;
 
     @Formula("(SELECT COUNT(*) FROM subscriptions s WHERE s.author_id = id)")
     private int subscriberCount;
