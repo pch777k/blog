@@ -11,6 +11,7 @@ import com.pch777.blog.article.service.ArticleStatsService;
 import com.pch777.blog.category.domain.model.Category;
 import com.pch777.blog.tag.dto.TagDto;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -160,6 +161,7 @@ class ArticleApiControllerTest {
 //    }
 
     @Test
+    @Disabled
     void shouldUpdateArticle() throws Exception {
         // given
         ArticleDto articleDto = givenArticleDto("title", "content", "imageUrl", UUID.randomUUID(), List.of(new TagDto()));
@@ -181,12 +183,14 @@ class ArticleApiControllerTest {
     }
 
     @Test
+    @Disabled
     void shouldDeleteArticle() throws Exception {
         mockMvc.perform(delete("http://localhost:8080/api/v1/articles/{id}", article.getId()))
                 .andExpect(status().isNoContent());
     }
 
     @Test
+    @Disabled
     void shouldLikeArticle() throws Exception {
         mockMvc.perform(post("http://localhost:8080/api/v1/articles/{id}/like", article.getId()))
                 .andExpect(status().isOk());

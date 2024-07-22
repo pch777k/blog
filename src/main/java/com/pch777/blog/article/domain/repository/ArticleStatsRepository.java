@@ -13,10 +13,10 @@ public interface ArticleStatsRepository extends JpaRepository<ArticleStats, UUID
     Optional<ArticleStats> findByArticleId(UUID id);
 
     @Modifying
-    @Query("UPDATE article_stats a SET a.views = a.views + 1 WHERE a.article.id = :articleId")
+    @Query("UPDATE ArticleStats a SET a.views = a.views + 1 WHERE a.article.id = :articleId")
     void incrementViewsByArticleId(@Param("articleId") UUID articleId);
 
     @Modifying
-    @Query("UPDATE article_stats a SET a.likes = a.likes + 1 WHERE a.article.id = :articleId")
+    @Query("UPDATE ArticleStats a SET a.likes = a.likes + 1 WHERE a.article.id = :articleId")
     void incrementLikesByArticleId(@Param("articleId") UUID articleId);
 }

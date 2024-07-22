@@ -8,7 +8,8 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@Entity(name = "article_stats")
+@Table(name = "article_stats")
+@Entity
 public class ArticleStats {
 
     @Id
@@ -28,4 +29,11 @@ public class ArticleStats {
         this.timeToRead = 0;
     }
 
+    public void incrementLikes() {
+        this.likes++;
+    }
+
+    public void decrementLikes() {
+        this.likes--;
+    }
 }

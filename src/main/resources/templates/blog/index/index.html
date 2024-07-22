@@ -1,40 +1,40 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{template :: head(title = 'Blog')}">
+<head th:replace="~{blog/template :: head(title = 'Blog')}">
 
 <body>
 
-<th:block th:replace="~{template :: header(categories = ${categories})}"/>
+<th:block th:replace="~{blog/template :: header(categories = ${categories})}"/>
 <main class="container">
     <div class="row">
         <div class="col-md-8">
-            <div th:replace="~{template :: articles-display(articles = ${summaryArticlesPage})}"></div>
+            <div th:replace="~{blog/template :: articles-display(articles = ${summaryArticlesPage})}"></div>
 
             <div class="row">
-                <div th:replace="~{template :: pagination-articles(href='/',
+                <div th:replace="~{blog/template :: pagination-articles(href='/',
                         currentPage=${currentPageNumber},
                         totalPages=${totalPagesNumber},
                         search=null,
                         size=${size})}">
                 </div>
 
-                <div th:replace="~{template :: pageNumber(href='/',
-                        currentPage=${currentPageNumber},
-                        totalPages=${totalPagesNumber})}">
-                </div>
+<!--                <div th:replace="~{blog/template :: pageNumber(href='/',-->
+<!--                        currentPage=${currentPageNumber},-->
+<!--                        totalPages=${totalPagesNumber})}">-->
+<!--                </div>-->
 
-                <div th:replace="~{template :: pageSize(href='/', size=${size})}"></div>
+<!--                <div th:replace="~{blog/template :: pageSize(href='/', size=${size})}"></div>-->
             </div>
 
         </div>
 
         <div class="col-md-4">
-            <form th:replace="~{template :: search-form(search = ${search})}"></form>
+            <form th:replace="~{blog/template :: search-form(search = ${search})}"></form>
             <div class="position-sticky" style="top: 2rem;">
-                <div th:replace="~{template :: popular-articles(tagstop3articles = ${tagstop3articles})}"></div>
-                <div th:replace="~{template :: popular-tags(tags = ${tags})}"></div>
+                <div th:replace="~{blog/template :: popular-articles(tagstop3articles = ${tagstop3articles})}"></div>
+                <div th:replace="~{blog/template :: popular-tags(tags = ${tags})}"></div>
                 <div class="row">
-                    <div th:replace="~{template :: archive-articles(monthYearList = ${monthYearList})}"></div>
+                    <div th:replace="~{blog/template :: archive-articles(monthYearList = ${monthYearList})}"></div>
                 </div>
                 <div class="p-4">
                     <h4 class="fst-italic">Elsewhere</h4>
@@ -50,7 +50,7 @@
 
 </main>
 
-<th:block th:replace="~{template :: footer}"/>
+<th:block th:replace="~{blog/template :: footer}"/>
 
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"

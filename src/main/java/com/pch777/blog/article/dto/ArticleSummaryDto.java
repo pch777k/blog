@@ -1,12 +1,14 @@
 package com.pch777.blog.article.dto;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class ArticleSummaryDto {
 
@@ -32,7 +34,6 @@ public class ArticleSummaryDto {
 
     private int likes;
 
-    private int totalComments;
-
+    private long totalComments;
 
 }
