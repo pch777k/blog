@@ -1,12 +1,105 @@
-insert into roles (id, name, description)
-values (gen_random_uuid(), 'READER', 'Reader - default user role'),
-       (gen_random_uuid(), 'AUTHOR', 'Author role'),
-       (gen_random_uuid(), 'ADMIN', 'Administrator role');
+insert into permissions (id, permission_type)
+values (gen_random_uuid(), 'ARTICLE_READ'),
+       (gen_random_uuid(), 'ARTICLE_CREATE'),
+       (gen_random_uuid(), 'ARTICLE_UPDATE'),
+       (gen_random_uuid(), 'ARTICLE_DELETE'),
+       (gen_random_uuid(), 'ARTICLE_LIKE'),
+       (gen_random_uuid(), 'COMMENT_READ'),
+       (gen_random_uuid(), 'COMMENT_CREATE'),
+       (gen_random_uuid(), 'COMMENT_UPDATE'),
+       (gen_random_uuid(), 'COMMENT_DELETE'),
+       (gen_random_uuid(), 'MESSAGE_SEND'),
+       (gen_random_uuid(), 'MESSAGE_RECEIVE'),
+       (gen_random_uuid(), 'USER_READ'),
+       (gen_random_uuid(), 'USER_CREATE'),
+       (gen_random_uuid(), 'USER_UPDATE'),
+       (gen_random_uuid(), 'USER_DELETE'),
+       (gen_random_uuid(), 'USER_SUBSCRIBE');
 
-insert into authors (id, username, password, email, bio, role_id)
-values (gen_random_uuid(), 'author', '$2b$10$YC5BaT2zhISVL8Syo3AAZeh/12IuBki0KUy1FdVdWYpERc3obFjU2', 'author@mail.com',
+
+
+INSERT INTO authors (id, first_name, last_name, username, password, email, avatar_url, bio, role, created, modified,
+                     is_enabled)
+VALUES (gen_random_uuid(),
+        'Anna',
+        'Williams',
+        'author',
+        '$2b$10$YC5BaT2zhISVL8Syo3AAZeh/12IuBki0KUy1FdVdWYpERc3obFjU2',
+        'author@mail.com',
+        'https://i.postimg.cc/RVhB1W6J/avatar07.jpg',
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-        (select id from roles where name = 'AUTHOR'));
+        'AUTHOR',
+        (select CURRENT_DATE - (random() * interval '365 days')),
+        now(),
+        true);
+
+INSERT INTO authors (id, first_name, last_name, username, password, email, avatar_url, bio, role, created, modified, is_enabled)
+VALUES (
+           gen_random_uuid(),
+           'Adam',
+           'Adminsky',
+           'admin',
+           '$2a$10$4fj1Y2yjOdp3BxU36dZam.fzLzrpWDMv1lqcUtvXh3EAB3dKrz/8a',
+           'admin@mail.com',
+           'https://i.postimg.cc/Hxmmb3XT/avatar03.jpg',
+           'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+           'ADMIN',
+           (CURRENT_DATE - (random() * interval '365 days')),
+           now(),
+           true
+       );
+
+WITH admin_user AS (
+    SELECT id FROM authors WHERE username = 'admin'
+),
+     admin_permissions AS (
+         SELECT id FROM permissions
+     )
+INSERT INTO user_permissions (user_id, permission_id)
+SELECT admin_user.id, admin_permissions.id
+FROM admin_user, admin_permissions;
+
+INSERT INTO authors (id, first_name, last_name, username, password, email, avatar_url, bio, role, created, modified,
+                     is_enabled)
+VALUES (gen_random_uuid(),
+        'Jason',
+        'Tatum',
+        'jason',
+        '$2a$10$znKsNQTAGKG0qV4HB19xg.LYaWShN.wDeY33sSEpcbhhsithpdR4.',
+        'jason@mail.com',
+        'https://i.postimg.cc/rm9kjWNx/avatar04.jpg',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+        'AUTHOR',
+        (select CURRENT_DATE - (random() * interval '365 days')),
+        now(),
+        true);
+
+
+INSERT INTO readers (id, first_name, last_name, username, password, email, avatar_url, role, created, modified, is_enabled)
+VALUES (gen_random_uuid(),
+        'Tom',
+        'Smith',
+        'reader',
+        '$2b$10$YC5BaT2zhISVL8Syo3AAZeh/12IuBki0KUy1FdVdWYpERc3obFjU2',
+        'reader@mail.com',
+        'https://i.postimg.cc/NFfwzMdV/avatar02.jpg',
+        'READER',
+        (select CURRENT_DATE - (random() * interval '365 days')),
+        now(),
+        true);
+
+INSERT INTO readers (id, first_name, last_name, username, password, email, avatar_url, role, created, modified, is_enabled)
+VALUES (gen_random_uuid(),
+        'John',
+        'Doe',
+        'john',
+        '$2a$10$nVAJmbiMhM40UNY8OlNWIeGuWpClmiWINN1vgyAZs7bU3VWZ55bTS',
+        'john@mail.com',
+        'https://i.postimg.cc/HnZCDgKL/avatar05.jpg',
+        'READER',
+        (select CURRENT_DATE - (random() * interval '365 days')),
+        now(),
+        true);
 
 insert into categories (id, name)
 values (gen_random_uuid(), 'World'),
@@ -51,7 +144,7 @@ values (gen_random_uuid(),
         'and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.',
         'https://picsum.photos/id/24/300/200',
         (select id from categories where name = 'Travel'),
-        (select id from authors where username = 'author'),
+        (select id from authors where username = 'jason'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -83,7 +176,7 @@ values (gen_random_uuid(),
         'and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.',
         'https://picsum.photos/id/44/300/200',
         (select id from categories where name = 'Travel'),
-        (select id from authors where username = 'author'),
+        (select id from authors where username = 'jason'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -115,7 +208,7 @@ values (gen_random_uuid(),
         'and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.',
         'https://picsum.photos/id/64/300/200',
         (select id from categories where name = 'Technology'),
-        (select id from authors where username = 'author'),
+        (select id from authors where username = 'jason'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -147,7 +240,7 @@ values (gen_random_uuid(),
         'and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.',
         'https://picsum.photos/id/84/300/200',
         (select id from categories where name = 'Design'),
-        (select id from authors where username = 'author'),
+        (select id from authors where username = 'jason'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -179,7 +272,7 @@ values (gen_random_uuid(),
         'and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.',
         'https://picsum.photos/id/99/300/200',
         (select id from categories where name = 'Technology'),
-        (select id from authors where username = 'author'),
+        (select id from authors where username = 'jason'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -200,7 +293,7 @@ values (gen_random_uuid(),
         'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.',
         'https://picsum.photos/id/1020/300/200',
         (select id from categories where name = 'U.S.'),
-        (select id from authors where username = 'author'),
+        (select id from authors where username = 'jason'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -220,7 +313,7 @@ values (gen_random_uuid(),
         'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
         'https://picsum.photos/id/930/300/200',
         (select id from categories where name = 'Design'),
-        (select id from authors where username = 'author'),
+        (select id from authors where username = 'jason'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -240,7 +333,7 @@ values (gen_random_uuid(),
         'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
         'https://picsum.photos/id/1040/300/200',
         (select id from categories where name = 'Business'),
-        (select id from authors where username = 'author'),
+        (select id from authors where username = 'jason'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -260,7 +353,7 @@ values (gen_random_uuid(),
         'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
         'https://picsum.photos/id/1050/300/200',
         (select id from categories where name = 'Opinion'),
-        (select id from authors where username = 'author'),
+        (select id from authors where username = 'jason'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now()),
 
@@ -300,7 +393,7 @@ values (gen_random_uuid(),
         'Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.',
         'https://picsum.photos/id/1070/300/200',
         (select id from categories where name = 'Travel'),
-        (select id from authors where username = 'author'),
+        (select id from authors where username = 'jason'),
         (select CURRENT_DATE - (random() * interval '365 days')),
         now());
 
@@ -402,13 +495,56 @@ values (gen_random_uuid(),
 update articles
 set title_url = CONCAT(REPLACE(LOWER(CONCAT(title, '-', RIGHT(id::text, 6))), ' ', '-'));
 
+-- INSERT INTO comments (id, article_id, user_id, content, created, modified)
+-- SELECT gen_random_uuid(),
+--        a.id,
+--        (select id from authors where username = 'author'),
+--        'Random comment for article ' || a.title_url,
+--        NOW(),
+--        NOW()
+-- FROM articles a
+--          CROSS JOIN LATERAL generate_series(1, 10) s
+
 INSERT INTO comments (id, article_id, user_id, content, created, modified)
 SELECT gen_random_uuid(),
        a.id,
        (select id from authors where username = 'author'),
        'Random comment for article ' || a.title_url,
-       NOW(),
+       LEAST(a.created + INTERVAL '1 day' + (random() * INTERVAL '10 days') + (random() * INTERVAL '86400 seconds'),
+             NOW()),
        NOW()
 FROM articles a
-         CROSS JOIN LATERAL generate_series(1, 10) s
+         CROSS JOIN LATERAL generate_series(1, 10) s;
 
+INSERT INTO comments (id, article_id, user_id, content, created, modified)
+SELECT gen_random_uuid(),
+       a.id,
+       (select id from readers where username = 'reader'),
+       'Comment for article',
+       LEAST(a.created + INTERVAL '1 day' + (random() * INTERVAL '10 days') + (random() * INTERVAL '86400 seconds'),
+             NOW()),
+       NOW()
+FROM articles a
+         CROSS JOIN LATERAL generate_series(1, 3) s;
+
+INSERT INTO comments (id, article_id, user_id, content, created, modified)
+SELECT gen_random_uuid(),
+       a.id,
+       (select id from readers where username = 'john'),
+       'John commented the article',
+       LEAST(a.created + INTERVAL '1 day' + (random() * INTERVAL '10 days') + (random() * INTERVAL '86400 seconds'),
+             NOW()),
+       NOW()
+FROM articles a
+         CROSS JOIN LATERAL generate_series(1, 3) s;
+
+-- INSERT INTO comments (id, article_id, user_id, content, created, modified)
+-- SELECT gen_random_uuid(),
+--        a.id,
+--        (select id from readers where username = 'jason'),
+--        'Some comment',
+--        LEAST(a.created + INTERVAL '1 day' + (random() * INTERVAL '10 days') + (random() * INTERVAL '86400 seconds'),
+--              NOW()),
+--        NOW()
+-- FROM articles a
+--          CROSS JOIN LATERAL generate_series(1, 3) s;

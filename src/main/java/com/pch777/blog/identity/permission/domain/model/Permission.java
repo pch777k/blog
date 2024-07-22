@@ -24,28 +24,9 @@ public class Permission {
     @Column(unique = true, nullable = false)
     private PermissionType permissionType;
 
-//    @ManyToMany(mappedBy = "permissions")
-//    @JsonIgnoreProperties("permissions")
-//    private Set<Role> roles = new HashSet<>();
-
     public Permission(PermissionType permissionType) {
         this.permissionType = permissionType;
     }
 
-//    public void addRole(Role role) {
-//        roles.add(role);
-//        role.getPermissions().add(this);
-//    }
-//
-//    public void removeRole(Role role) {
-//        roles.remove(role);
-//        role.getPermissions().remove(this);
-//    }
-//
-//    public void removeRoles() {
-//        Permission self = this;
-//        roles.forEach(role -> role.getPermissions().remove(self));
-//        roles.clear();
-//    }
 }
 
