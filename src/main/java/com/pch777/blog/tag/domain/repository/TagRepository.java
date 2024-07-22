@@ -1,6 +1,8 @@
 package com.pch777.blog.tag.domain.repository;
 
 import com.pch777.blog.tag.domain.model.Tag;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -23,5 +25,7 @@ public interface TagRepository extends JpaRepository<Tag, UUID> {
             """,
             nativeQuery = true)
     List<Tag> find10TagsByPopularity();
+
+    Page<Tag> findAllByNameContainingIgnoreCase(String name, Pageable pageable);
 
 }

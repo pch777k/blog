@@ -1,6 +1,6 @@
 package com.pch777.blog.tag.domain.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pch777.blog.article.domain.model.Article;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -14,7 +14,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
-@Entity(name = "tags")
+@Table(name = "tags")
+@Entity
 public class Tag {
 
     @Id
@@ -26,18 +27,8 @@ public class Tag {
 
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable
-    @JsonIgnoreProperties("tags")
+    @JsonIgnore
     private Set<Article> articles = new HashSet<>();
-
-    public void addArticle(Article article) {
-        articles.add(article);
-        article.getTags().add(this);
-    }
-
-    public void removeArticle(Article article) {
-        articles.remove(article);
-        article.getTags().remove(this);
-    }
 
     public void removeArticles() {
         Tag self = this;

@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -57,16 +58,10 @@ public class TagApiController {
         return tagService.createTag(tagDto);
     }
 
-    @PutMapping("{id}")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public Tag updateTag(@PathVariable UUID id, @Valid @RequestBody TagDto tagDto) {
-        return tagService.updateTag(id, tagDto);
-    }
-
     @DeleteMapping("{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteTag(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteTag(@PathVariable UUID id) {
         tagService.deleteTag(id);
+        return ResponseEntity.noContent().build();
     }
 }
 

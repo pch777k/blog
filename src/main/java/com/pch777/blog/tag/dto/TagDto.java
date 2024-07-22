@@ -6,6 +6,6 @@ import lombok.Data;
 @Data
 public class TagDto {
 
-    @Pattern(regexp = "^$|^.{3,20}$", message = "Length must be between 3 and 20 characters")
+    @Pattern(regexp = "^$|^.{3,30}$", message = "Length must be between 3 and 30 characters")
     private String name;
 }
