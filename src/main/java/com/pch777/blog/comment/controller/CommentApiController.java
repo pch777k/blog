@@ -8,8 +8,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.security.Principal;
 import java.util.UUID;
 
@@ -21,39 +24,46 @@ public class CommentApiController {
     private final CommentService commentService;
 
     @GetMapping
-    Page<Comment> getComments(@PathVariable("article-id") UUID articleId, Pageable pageable) {
-        return commentService.getCommentsByArticleId(articleId, pageable);
+    ResponseEntity<Page<Comment>> getComments(@PathVariable("article-id") UUID articleId, Pageable pageable) {
+        Page<Comment> pageComments = commentService.getCommentsByArticleId(articleId, pageable);
+        return ResponseEntity.ok(pageComments);
     }
 
     @GetMapping("{comment-id}")
-    Comment getComment(@PathVariable("article-id") UUID articleId,
+    ResponseEntity<Comment> getComment(@PathVariable("article-id") UUID articleId,
                        @PathVariable("comment-id") UUID commentId) {
-        return commentService.getCommentById(commentId);
+        Comment comment = commentService.getCommentById(commentId);
+        return ResponseEntity.ok(comment);
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    Comment createComment(@PathVariable("article-id") UUID articleId,
-                          @Valid @RequestBody CommentDto commentDto,
-                          Principal principal) {
-        return commentService.createComment(articleId, commentDto, principal.getName());
+    public ResponseEntity<Comment> createComment(@PathVariable("article-id") UUID articleId,
+                                                 @Valid @RequestBody CommentDto commentDto,
+                                                 Principal principal) {
+        Comment createdComment = commentService.createComment(articleId, commentDto, principal.getName());
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(createdComment.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(createdComment);
     }
 
     @PutMapping("{comment-id}")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    Comment updateComment(@PathVariable("article-id") UUID articleId,
-                          @PathVariable("comment-id") UUID commentId,
-                          @Valid @RequestBody CommentDto commentDto,
-                          Principal principal
-    ) {
-        return commentService.updateComment(commentId, commentDto, principal.getName());
+    public ResponseEntity<Comment> updateComment(@PathVariable("article-id") UUID articleId,
+                                                 @PathVariable("comment-id") UUID commentId,
+                                                 @Valid @RequestBody CommentDto commentDto,
+                                                 Principal principal) {
+        Comment updatedComment = commentService.updateComment(commentId, commentDto, principal.getName());
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(updatedComment);
     }
 
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("{comment-id}")
-    void deleteComment(@PathVariable("article-id") UUID articleId,
-                       @PathVariable("comment-id") UUID commentId,
-                       Principal principal) {
+    public ResponseEntity<Void> deleteComment(@PathVariable("article-id") UUID articleId,
+                                              @PathVariable("comment-id") UUID commentId,
+                                              Principal principal) {
         commentService.deleteComment(commentId, principal.getName());
+        return ResponseEntity.noContent().build();
     }
 }

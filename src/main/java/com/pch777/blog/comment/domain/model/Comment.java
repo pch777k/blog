@@ -2,7 +2,7 @@ package com.pch777.blog.comment.domain.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pch777.blog.article.domain.model.Article;
-import com.pch777.blog.user.domain.model.User;
+import com.pch777.blog.identity.user.domain.model.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
