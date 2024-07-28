@@ -77,6 +77,7 @@ public class ArticleMapper {
 
         return ArticleSummaryDto.builder()
                 .id(article.getId())
+                .authorName(article.getAuthor().getFullName())
                 .title(article.getTitle())
                 .titleUrl(article.getTitleUrl())
                 .shortContent(shortContent)

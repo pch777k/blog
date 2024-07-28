@@ -26,8 +26,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.security.Principal;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @RequiredArgsConstructor
 @RequestMapping("api/v1/articles")
@@ -88,17 +87,24 @@ public class ArticleApiController {
     public ResponseEntity<Object> likeArticle(@PathVariable UUID id,
                                               @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized access.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("message", "Unauthorized access."));
         }
 
         User user = userService.getUserByUsername(userDetails.getUsername());
         Article article = articleService.getArticleById(id);
 
         try {
-            UserArticleLike userArticleLike = userArticleLikeService.likeArticle(user, article);
-            return ResponseEntity.ok(userArticleLike);
+            userArticleLikeService.likeArticle(user, article);
+            long updatedLikesCount = article.getStats().getLikes(); // Zakładamy, że masz metodę do pobierania liczby polubień
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("message", "Like added successfully");
+            response.put("articleId", article.getId());
+            response.put("likesCount", updatedLikesCount);
+
+            return ResponseEntity.ok(response);
         } catch (UserLikedException ex) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("User already liked the article.");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Collections.singletonMap("message", "User already liked the article."));
         }
     }
 

@@ -49,7 +49,6 @@ public class ArticleViewController extends BlogCommonViewController {
     public static final String ARTICLE_SINGLE = "blog/article/single";
     public static final String REDIRECT_ARTICLES = "redirect:/articles/";
     public static final String MESSAGE = "message";
-    public static final String ARTICLE_COMMENT_EDIT = "blog/article/comment/edit";
     public static final String COMMENTS_CONTAINER = "#commentsContainer";
 
 
@@ -79,15 +78,17 @@ public class ArticleViewController extends BlogCommonViewController {
                              @AuthenticationPrincipal UserDetails userDetails) {
 
         Pageable pageable = PageRequest.of(page, blogConfiguration.getCommentsPageSize(), Sort.Direction.fromString("desc"), "created");
-        User currentUser = userService.getUserByUsername(userDetails.getUsername());
-        boolean canSendMessages = userService.canSendMessages(currentUser.getId());
+        boolean canSendMessages = false;
+        if(userDetails != null) {
+            User currentUser = userService.getUserByUsername(userDetails.getUsername());
+            canSendMessages = userService.canSendMessages(currentUser.getId());
+        }
+
         prepareArticleModelAttributes(titleUrl, model, pageable);
         CommentDto commentDto = new CommentDto();
         model.addAttribute("commentDto", commentDto);
         model.addAttribute("commentService", commentService);
         model.addAttribute("canSendMessages", canSendMessages);
-
-
 
         addGlobalAttributes(model, userDetails);
 
@@ -96,17 +97,25 @@ public class ArticleViewController extends BlogCommonViewController {
 
     @PostMapping("{titleUrl}/comments/add")
     public String addComment(@PathVariable String titleUrl,
+                             @RequestParam(name = "page", required = false, defaultValue = "0") int page,
                              @Valid @ModelAttribute("commentDto") CommentDto commentDto,
                              BindingResult bindingResult,
                              RedirectAttributes redirectAttributes,
                              @AuthenticationPrincipal UserDetails userDetails,
-                             Model model,
-                             @PageableDefault(size = 2) Pageable pageable
+                             Model model
     ) {
+        Pageable pageable = PageRequest.of(page, blogConfiguration.getCommentsPageSize(), Sort.Direction.fromString("desc"), "created");
         addGlobalAttributes(model, userDetails);
+        boolean canSendMessages = false;
+        if(userDetails != null) {
+            User currentUser = userService.getUserByUsername(userDetails.getUsername());
+            canSendMessages = userService.canSendMessages(currentUser.getId());
+        }
+        model.addAttribute("commentService", commentService);
         if (bindingResult.hasErrors()) {
             prepareArticleModelAttributes(titleUrl, model, pageable);
             model.addAttribute(MESSAGE, Message.error("Error during comment creation!"));
+            model.addAttribute("canSendMessages", canSendMessages);
             log.error("Error on comment.add");
             return ARTICLE_SINGLE;
         }
@@ -118,6 +127,7 @@ public class ArticleViewController extends BlogCommonViewController {
         } catch (Exception e) {
             log.error("Error on comment.add", e);
             model.addAttribute(MESSAGE, Message.error("Unknown error during comment creation!"));
+            model.addAttribute("canSendMessages", canSendMessages);
             return ARTICLE_SINGLE;
         }
 
@@ -146,18 +156,33 @@ public class ArticleViewController extends BlogCommonViewController {
     @GetMapping("{titleUrl}/comments/{commentId}/edit")
     public String editCommentView(@PathVariable String titleUrl,
                                   @PathVariable UUID commentId,
+                                  @RequestParam(name = "page", required = false, defaultValue = "0") int page,
                                   Model model,
                                   @AuthenticationPrincipal UserDetails userDetails) {
         Comment comment = commentService.getCommentById(commentId);
         CommentDto commentDto = new CommentDto(comment.getContent());
+        Pageable pageable = PageRequest.of(page, blogConfiguration.getCommentsPageSize(), Sort.Direction.fromString("desc"), "created");
+        boolean canSendMessages = false;
+        if(userDetails != null) {
+            User currentUser = userService.getUserByUsername(userDetails.getUsername());
+            canSendMessages = userService.canSendMessages(currentUser.getId());
+        }
 
+        prepareArticleModelAttributes(titleUrl, model, pageable);
+
+        model.addAttribute("commentDto", commentDto);
+        model.addAttribute("commentService", commentService);
+        model.addAttribute("canSendMessages", canSendMessages);
+        model.addAttribute("commentId", commentId);
 
         model.addAttribute("titleUrl", titleUrl);
-        model.addAttribute("commentDto", commentDto);
-        model.addAttribute("user", userService.getUserByUsername(userDetails.getUsername()));
         addGlobalAttributes(model, userDetails);
 
-        return "blog/article/comment/form";
+        return ARTICLE_SINGLE;
+
+        //return ARTICLE_COMMENT_EDIT;
+
+        //return "blog/article/comment/form";
     }
 
     @PostMapping("{titleUrl}/comments/{commentId}/edit")
@@ -166,23 +191,29 @@ public class ArticleViewController extends BlogCommonViewController {
                               @Valid @ModelAttribute("commentDto") CommentDto commentDto,
                               BindingResult bindingResult,
                               RedirectAttributes redirectAttributes,
-                              Principal principal,
-                              Model model) {
+                              @AuthenticationPrincipal UserDetails userDetails,
+                              Model model,
+                              @PageableDefault(size = 10) Pageable pageable) {
+
+        addGlobalAttributes(model, userDetails);
+        model.addAttribute("commentService", commentService);
 
         if (bindingResult.hasErrors()) {
+            prepareArticleModelAttributes(titleUrl, model, pageable);
+            model.addAttribute("commentDto", commentDto);
             model.addAttribute(MESSAGE, Message.error("Error during comment edition!"));
             log.error("Error on comment.edit");
-            return ARTICLE_COMMENT_EDIT;
+            return ARTICLE_SINGLE;
         }
 
         try {
-            commentService.updateComment(commentId, commentDto, principal.getName());
+            commentService.updateComment(commentId, commentDto, userDetails.getUsername());
             redirectAttributes.addFlashAttribute(MESSAGE, Message.info("Comment edited successfully!"));
             log.info("Comment edited successfully!");
         } catch (Exception e) {
             log.error("Error on comment.edit", e);
             model.addAttribute(MESSAGE, Message.error("Unknown error during comment edition!"));
-            return ARTICLE_COMMENT_EDIT;
+            return ARTICLE_SINGLE;
         }
 
         return REDIRECT_ARTICLES + titleUrl + COMMENTS_CONTAINER;

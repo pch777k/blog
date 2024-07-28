@@ -197,5 +197,9 @@ public class ArticleService {
     }
 
 
+    public Page<ArticleSummaryDto> getSummaryArticlesByAuthorId(UUID authorId, Pageable pageable) {
+        Page<Article> articlesPage = articleRepository.findByAuthorId(authorId, pageable);
+        return articlesPage.map(articleMapper::mapToArticleSummaryDto);
+    }
 }
 

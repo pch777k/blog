@@ -14,6 +14,8 @@ public class ArticleSummaryDto {
 
     private UUID id;
 
+    private String authorName;
+
     private String title;
 
     private String titleUrl;
