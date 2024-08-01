@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{user/template :: head(title = 'Article form')}"></head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+    <!-- Main Sidebar Container -->
+    <th:block th:replace="~{user/template :: sidebar(${profile})}"></th:block>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>General Form</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                            <li class="breadcrumb-item active">General Form</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <!-- left column -->
+                    <div class="col-md-12">
+                        <!-- general form elements -->
+                        <div class="card card-secondary">
+                            <div class="card-header">
+                                <h3 th:text="${id == null} ? 'Add Article' : 'Edit Article'" class="card-title"></h3>
+                            </div>
+                            <!-- /.card-header -->
+                            <!-- form start -->
+                            <form th:object="${articleDto}" method="post"
+                                  th:action="${id == null} ? @{/author/articles/add} : @{/author/articles/{id}/edit (id=${id})}">
+                                <div class="card-body">
+                                    <div th:if="${message != null}" class="alert alert-danger" role="alert">
+                                        <i class="bi bi-exclamation-triangle"></i> <span th:text="${message.content}">Error during article edition!</span>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="title" class="form-label">Title</label>
+                                        <input th:field="*{title}" type="text" class="form-control" id="title"
+                                               placeholder="title">
+                                        <small><span class="text text-danger" th:if="${#fields.hasErrors('title')}"
+                                                     th:errors="*{title}"></span></small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="summernote" class="form-label">Content</label>
+                                        <textarea th:field="*{content}" class="form-control" id="summernote" rows="6"
+                                                  placeholder="Content ..."></textarea>
+                                        <small><span class="text text-danger" th:if="${#fields.hasErrors('content')}"
+                                                     th:errors="*{content}"></span></small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="image-url" class="form-label">Image url</label>
+                                        <input th:field="*{imageUrl}" class="form-control" id="image-url">
+                                        <small><span class="text text-danger" th:if="${#fields.hasErrors('imageUrl')}"
+                                                     th:errors="*{imageUrl}"></span></small>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-auto mb-3">
+                                            <label for="tag1" class="form-label">Tag 1</label>
+                                            <input th:field="*{tagDtoList[0].name}" class="form-control" id="tag1"
+                                                   placeholder="#tag">
+                                            <small><span class="text text-danger"
+                                                         th:if="${#fields.hasErrors('tagDtoList[0].name')}"
+                                                         th:errors="*{tagDtoList[0].name}"></span></small>
+                                        </div>
+                                        <div class="col-auto mb-3">
+                                            <label for="tag2" class="form-label">Tag 2</label>
+                                            <input th:field="*{tagDtoList[1].name}" class="form-control" id="tag2"
+                                                   placeholder="#tag">
+                                            <small><span class="text text-danger"
+                                                         th:if="${#fields.hasErrors('tagDtoList[1].name')}"
+                                                         th:errors="*{tagDtoList[1].name}"></span></small>
+                                        </div>
+                                        <div class="col-auto mb-3">
+                                            <label for="tag3" class="form-label">Tag 3</label>
+                                            <input th:field="*{tagDtoList[2].name}" class="form-control" id="tag3"
+                                                   placeholder="#tag">
+                                            <small><span class="text text-danger"
+                                                         th:if="${#fields.hasErrors('tagDtoList[2].name')}"
+                                                         th:errors="*{tagDtoList[2].name}"></span></small>
+                                        </div>
+                                        <div class="col-auto mb-3">
+                                            <label for="tag4" class="form-label">Tag 4</label>
+                                            <input th:field="*{tagDtoList[3].name}" class="form-control" id="tag4"
+                                                   placeholder="#tag">
+                                            <small><span class="text text-danger"
+                                                         th:if="${#fields.hasErrors('tagDtoList[3].name')}"
+                                                         th:errors="*{tagDtoList[3].name}"></span></small>
+                                        </div>
+                                        <div class="col-auto mb-3">
+                                            <label for="tag5" class="form-label">Tag 5</label>
+                                            <input th:field="*{tagDtoList[4].name}" class="form-control" id="tag5"
+                                                   placeholder="#tag">
+                                            <small><span class="text text-danger"
+                                                         th:if="${#fields.hasErrors('tagDtoList[4].name')}"
+                                                         th:errors="*{tagDtoList[4].name}"></span></small>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="form-group">
+                                            <label>Category</label>
+                                            <select class="form-control" th:field="*{categoryId}"
+                                                    aria-label="select category">
+                                                <option th:each="category : ${categories}"
+                                                        th:value="${category.id}"
+                                                        th:text="${category.name}">category
+                                                </option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <!-- /.card-body -->
+
+                                <div class="card-footer">
+                                    <button type="submit" th:text="${id == null} ? 'Add article' : 'Edit article'"
+                                            class="btn btn-primary"></button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                </div>
+                <!-- /.row -->
+            </div>
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <th:block th:replace="~{user/template :: footer}"></th:block>
+
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+        <!-- Control sidebar content goes here -->
+    </aside>
+    <!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+<!-- REQUIRED SCRIPTS -->
+
+<!-- jQuery -->
+<script src="plugins/jquery/jquery.min.js"></script>
+<!-- AdminLTE App -->
+<script src="js/adminlte.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
+        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+        crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.18/dist/summernote-bs4.min.js"></script>
+<script>
+    $('#summernote').summernote({
+        placeholder: 'Content',
+        tabsize: 2,
+        height: 400
+    });
+</script>
+</body>
+</html>
