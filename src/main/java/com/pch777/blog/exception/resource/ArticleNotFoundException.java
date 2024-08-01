@@ -1,4 +1,4 @@
-package com.pch777.blog.exception;
+package com.pch777.blog.exception.resource;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
