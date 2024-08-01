@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{user/template :: head(title = 'Blog')}"></head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+    <!-- Main Sidebar Container -->
+    <th:block th:replace="~{user/template :: sidebar(${profile})}"></th:block>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1 class="m-0">Private messages</h1>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+
+                <!-- /.card -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <!-- DIRECT CHAT -->
+                        <div class="card direct-chat direct-chat-warning">
+                            <div class="card-header">
+                                <h3 class="card-title">
+                                    <a th:href="@{/user/messages}">
+                                        <i class="fa fa-arrow-circle-left mr-2"></i>
+                                    </a>
+                                    Chat with <span th:text="${contactUser.fullName}"></span>
+                                </h3>
+
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body">
+                                <!-- Conversations are loaded here -->
+                                <div class="direct-chat-messages">
+                                    <div th:each="message, iterStat : ${messages}">
+                                        <div th:if="${message.sender.id != profile.userId}" class="direct-chat-msg right">
+                                            <div class="direct-chat-infos clearfix">
+                                                <span class="direct-chat-name float-right"
+                                                      th:text="${message.sender.fullName}"></span>
+                                                <span class="direct-chat-timestamp float-left"
+                                                      th:text="${#temporals.format(message.timestamp, 'dd MMM HH:mm')}"></span>
+                                            </div>
+                                            <img class="direct-chat-img" th:src="${message.sender.avatarUrl}"
+                                                 alt="message user image">
+                                            <div class="direct-chat-text" th:text="${message.content}"></div>
+                                        </div>
+
+                                        <div th:if="${message.sender.id == profile.userId}" class="direct-chat-msg">
+                                            <div class="direct-chat-infos clearfix">
+                                                <span class="direct-chat-name float-left"
+                                                      th:text="${message.sender.fullName}"></span>
+                                                <span class="direct-chat-timestamp float-right"
+                                                      th:text="${#temporals.format(message.timestamp, 'dd MMM HH:mm')}"></span>
+                                            </div>
+                                            <img class="direct-chat-img" th:src="${message.sender.avatarUrl}"
+                                                 alt="message user image">
+                                            <div class="direct-chat-text" th:text="${message.content}"></div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <!--/.direct-chat-messages-->
+
+                                <!-- /.direct-chat-pane -->
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer">
+                                <form th:object="${privateMessageDto}" method="post"
+                                      th:action="@{'/user/messages/' + ${contactId}}">
+                                    <div class="input-group">
+                                        <input th:field="*{content}" type="text" name="content"
+                                               placeholder="Type Message ..." class="form-control">
+                                        <span class="input-group-append">
+                                        <button type="submit" class="btn btn-warning" th:attr="disabled=${!canSendMessages}">Send</button>
+                                    </span>
+                                    </div>
+                                </form>
+                            </div>
+                            <!-- /.card-footer-->
+                        </div>
+                        <!--/.direct-chat -->
+                    </div>
+                    <!-- /.col -->
+
+                </div>
+                <!-- /.row -->
+
+
+                <!-- /.row -->
+            </div><!--/. container-fluid -->
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <th:block th:replace="~{user/template :: footer}"></th:block>
+
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+        <!-- Control sidebar content goes here -->
+    </aside>
+    <!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+
+<div th:insert="~{user/fragments :: common-scripts}"></div>
+
+
+<script>
+
+
+</script>
+
+</body>
+</html>
