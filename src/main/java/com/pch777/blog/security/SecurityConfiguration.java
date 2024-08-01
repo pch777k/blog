@@ -50,8 +50,6 @@ public class SecurityConfiguration {
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/author/**").hasAnyRole("ADMIN", "AUTHOR")
                         .requestMatchers("/reader/**").hasAnyRole("READER")
-                      //  .requestMatchers("/api/v1/users").permitAll()
-                      //  .requestMatchers("/api/v1/users/readers").permitAll()
                         .anyRequest().authenticated()
                 )
                 .logout(logout -> logout.logoutSuccessUrl("/"))
