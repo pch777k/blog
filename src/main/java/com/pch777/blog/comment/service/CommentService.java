@@ -5,10 +5,10 @@ import com.pch777.blog.article.domain.repository.ArticleRepository;
 import com.pch777.blog.comment.domain.model.Comment;
 import com.pch777.blog.comment.domain.repository.CommentRepository;
 import com.pch777.blog.comment.dto.CommentDto;
-import com.pch777.blog.exception.ArticleNotFoundException;
-import com.pch777.blog.exception.CommentNotFoundException;
-import com.pch777.blog.exception.ForbiddenException;
-import com.pch777.blog.exception.UnauthorizedException;
+import com.pch777.blog.exception.resource.ArticleNotFoundException;
+import com.pch777.blog.exception.resource.CommentNotFoundException;
+import com.pch777.blog.exception.authentication.ForbiddenException;
+import com.pch777.blog.exception.authentication.UnauthorizedException;
 import com.pch777.blog.identity.user.domain.model.Role;
 import com.pch777.blog.notification.domain.model.NotificationType;
 import com.pch777.blog.notification.service.NotificationService;
@@ -67,6 +67,7 @@ public class CommentService {
     }
 
     @Transactional
+    @PreAuthorize("hasAuthority('COMMENT_CREATE')")
     public Comment createComment(UUID articleId, CommentDto commentDto, String username) {
         User user = userService.getUserByUsername(username);
         Article article = articleRepository.findById(articleId)
@@ -79,15 +80,21 @@ public class CommentService {
     }
 
     @Transactional
+    @PreAuthorize("hasAuthority('COMMENT_UPDATE')")
     public Comment updateComment(UUID commentId, CommentDto commentDto, String username) {
+        User user = userService.getUserByUsername(username);
         Comment comment = validateAndProcessComment(commentId, username);
         comment.setContent(commentDto.getContent());
+        notificationService.createNotification(user, "You updated comment", NotificationType.COMMENT);
         return commentRepository.save(comment);
     }
 
     @Transactional
+    @PreAuthorize("hasAuthority('COMMENT_DELETE')")
     public void deleteComment(UUID commentId, String username) {
+        User user = userService.getUserByUsername(username);
         validateAndProcessComment(commentId, username);
+        notificationService.createNotification(user, "You deleted comment", NotificationType.COMMENT);
         commentRepository.deleteById(commentId);
     }
 
@@ -109,9 +116,5 @@ public class CommentService {
         return authentication != null &&
                 authentication.getPrincipal() instanceof UserDetails &&
                 commentRepository.existsByUser_IdAndId(userId, commentId);
-    }
-
-    public List<Comment> getCommentsByArticleTitleUrl(String titleUrl) {
-        return commentRepository.findByArticleTitleUrl(titleUrl);
     }
 }

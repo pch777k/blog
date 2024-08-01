@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{user/template :: head(title = 'Blog')}"></head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+    <!-- Main Sidebar Container -->
+    <th:block th:replace="~{user/template :: sidebar(${profile})}"></th:block>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Comments</h1>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <!-- /.row -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div th:if="${commentPage.empty}" class="card">
+                                    <div class="card-body text-info">
+                                        <span th:if="${search == null || search.isEmpty()}">You have no comments.</span>
+                                        <th:block th:unless="${search == null || search.isEmpty()}">
+                                            Result not found for : '<span th:text="${search}"></span>'
+                                            <a th:href="@{/user/comments}" class="btn btn-primary btn-sm ml-2">
+                                                <i class="fa fa-times p-0"></i>
+                                            </a>
+                                        </th:block>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div th:unless="${commentPage.empty}" class="card">
+                            <div class="card-header">
+                                <th:block th:unless="${search == null || search.isEmpty()}">
+                                    Result found for : '<span th:text="${search}"></span><span class="mr-2">'</span>
+                                    <a th:href="@{/user/comments}"  class="btn btn-primary btn-sm">
+                                        <i class="fa fa-times p-0"></i>
+                                    </a>
+                                </th:block>
+                                <div class="card-tools">
+                                    <form role="search"
+                                          th:action="@{'/user/comments'}">
+                                        <div class="input-group input-group-sm" style="width: 250px;">
+                                            <input th:value="${search}" type="text" name="s"
+                                                   class="form-control float-right" placeholder="Search" required>
+
+                                            <div class="input-group-append">
+                                                <button type="submit" class="btn btn-default">
+                                                    <i class="fas fa-search"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+
+                                </div>
+                            </div>
+                            <!-- /.card-header -->
+                            <div th:unless="${commentPage.empty}" class="card-body table-responsive p-0">
+                                <table class="table table-hover text-nowrap">
+                                    <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>
+                                            <a th:if="${search != ''}"
+                                               th:href="@{/user/comments(field='created', direction=${direction == 'asc' ? 'desc' : 'asc'}, s=${search})}">
+                                                Created
+                                                <span th:if="${field eq 'created' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'created' && direction == 'desc'}">&#9660;</span>
+                                            </a>
+                                            <a th:if="${search == ''}"
+                                               th:href="@{/user/comments(field='created', direction=${direction == 'asc' ? 'desc' : 'asc'})}">Created
+                                                <span th:if="${field eq 'created' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'created' && direction == 'desc'}">&#9660;</span></a>
+                                        </th>
+                                        <th>
+                                            <a th:if="${search != ''}"
+                                               th:href="@{/user/comments(field='content', direction=${direction == 'asc' ? 'desc' : 'asc'}, s=${search})}">
+                                                Content
+                                                <span th:if="${field eq 'content' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'content' && direction == 'desc'}">&#9660;</span>
+                                            </a>
+                                            <a th:if="${search == ''}"
+                                               th:href="@{/user/comments(field='content', direction=${direction == 'asc' ? 'desc' : 'asc'})}">Content
+                                                <span th:if="${field eq 'content' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'content' && direction == 'desc'}">&#9660;</span></a>
+                                        </th>
+                                        <th>
+                                            <a th:if="${search != ''}"
+                                               th:href="@{/user/comments (field='article.title', direction=${direction == 'asc' ? 'desc' : 'asc'}, s=${search})}">
+                                                Title of article
+                                                <span th:if="${field eq 'article.title' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'article.title' && direction == 'desc'}">&#9660;</span>
+                                            </a>
+                                            <a th:if="${search == ''}"
+                                               th:href="@{/user/comments (field='article.title', direction=${direction == 'asc' ? 'desc' : 'asc'})}">Title of article
+                                                <span th:if="${field eq 'article.title' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'article.title' && direction == 'desc'}">&#9660;</span></a>
+                                        </th>
+                                        <th>Action</th>
+                                    <tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="comment, it : ${commentPage.content}">
+                                        <td th:text="${currentPageNumber * size + it.index + 1}"></td>
+                                        <td th:text="${#temporals.format(comment.created, 'yyyy/MM/dd, HH:mm')}"></td>
+                                        <td th:text="${#strings.length(comment.content) > 100 ? #strings.substring(comment.content, 0, 100) + '...' : comment.content}"></td>
+                                        <td><a th:href="@{'/articles/'+ ${comment.article.titleUrl}}"
+                                               th:text="${#strings.length(comment.article.title) > 60 ? #strings.substring(comment.article.title, 0, 60) + '...' : comment.article.title}" style="color: black; text-decoration: none;"></a></td>
+                                        <td>
+                                            <a th:href="@{'/articles/'+ ${comment.article.titleUrl} + '#comment-' + ${comment.id}}"
+                                               class="btn btn-primary btn-sm">
+                                                <i class="fas fa-folder mr-1"></i> View
+                                            </a>
+                                            <a th:href="@{'/articles/' + ${comment.article.titleUrl} + '/comments/'+${comment.id} + '/edit'}"
+                                               class="btn btn-info btn-sm"
+                                               th:classappend="${#authorization.expression('!hasAuthority(''COMMENT_UPDATE'')')} ? ' disabled' : ''">
+                                                <i class="fas fa-pencil-alt mr-1"></i> Edit
+                                            </a>
+                                            <a th:href="@{'/articles/' + ${comment.article.titleUrl} + '/comments/'+${comment.id}+'/delete'}"
+                                               class="btn btn-danger btn-sm"
+                                               th:classappend="${#authorization.expression('!hasAuthority(''COMMENT_DELETE'')')} ? ' disabled' : ''"
+                                               onclick="return confirm('Are you sure delete this comment?');">
+                                                <i class="fas fa-trash mr-1"> </i> Delete
+                                            </a>
+
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                            <!-- /.card-body -->
+                            <div th:unless="${commentPage.empty}" class="card-footer">
+                                <div class="row">
+                                    <span  class="mr-4"
+                                          th:text="'Showing ' + (${commentPage.number} * ${commentPage.size} + 1) + ' to ' + (${commentPage.number} * ${commentPage.size} + ${commentPage.size} &gt; ${commentPage.totalElements} ? ${commentPage.totalElements} : ${commentPage.number} * ${commentPage.size} + ${commentPage.size}) + ' of ' + ${commentPage.totalElements} + ' entries'"></span>
+                                    <div th:replace="~{blog/template :: pagination-author-articles(href='/user/comments',
+                                                                                                    currentPage=${currentPageNumber},
+                                                                                                    totalPages=${totalPagesNumber},
+                                                                                                    search=${search == '' ? null : search},
+                                                                                                    field=${field},
+                                                                                                    direction=${direction},
+                                                                                                    size=${size})}">
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.container-fluid -->
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <th:block th:replace="~{user/template :: footer}"></th:block>
+
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+        <!-- Control sidebar content goes here -->
+    </aside>
+    <!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+<!-- REQUIRED SCRIPTS -->
+<script type="text/javascript">
+    $(function () {
+        $('#datetimepicker7').datetimepicker();
+        $('#datetimepicker8').datetimepicker({
+            useCurrent: false
+        });
+        $("#datetimepicker7").on("change.datetimepicker", function (e) {
+            $('#datetimepicker8').datetimepicker('minDate', e.date);
+        });
+        $("#datetimepicker8").on("change.datetimepicker", function (e) {
+            $('#datetimepicker7').datetimepicker('maxDate', e.date);
+        });
+    });
+</script>
+<div th:insert="~{user/fragments :: common-scripts}"></div>
+</body>
+</html>
