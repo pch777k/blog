@@ -1,0 +1,203 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{user/template :: head(title = 'Blog')}"></head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+    <!-- Main Sidebar Container -->
+    <th:block th:replace="~{user/template :: sidebar(${profile})}"></th:block>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>Authors</h1>
+                    </div>
+                </div>
+            </div><!-- /.container-fluid -->
+        </section>
+
+        <!-- Main content -->
+        <section class="content">
+            <div class="container-fluid">
+                <!-- /.row -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div th:if="${authorsPage.empty}" class="card">
+                                    <div class="card-body text-info">
+                                        There are no readers.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div th:unless="${authorsPage.empty}" class="card">
+                            <div class="card-header">
+                                <div class="card-tools">
+                                    <form role="search"
+                                          th:action="@{'/admin/authors'}">
+                                        <div class="input-group input-group-sm" style="width: 250px;">
+                                            <input th:value="${search}" type="text" name="s" class="form-control float-right" placeholder="Search">
+
+                                            <div class="input-group-append">
+                                                <button type="submit" class="btn btn-default">
+                                                    <i class="fas fa-search"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+
+                                </div>
+                            </div>
+                            <!-- /.card-header -->
+                            <div class="card-body table-responsive p-0">
+                                <table class="table table-hover text-nowrap">
+                                    <thead>
+                                    <tr>
+                                        <th>Avatar</th>
+                                        <th>
+                                            <a th:if="${search != ''}"
+                                               th:href="@{/admin/authors(field='lastName', direction=${direction == 'asc' ? 'desc' : 'asc'}, s=${search})}">
+                                                Name
+                                                <span th:if="${field eq 'lastName' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'lastName' && direction == 'desc'}">&#9660;</span>
+                                            </a>
+                                            <a th:if="${search == ''}"
+                                               th:href="@{/admin/authors(field='lastName', direction=${direction == 'asc' ? 'desc' : 'asc'})}">Name
+                                                <span th:if="${field eq 'lastName' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'lastName' && direction == 'desc'}">&#9660;</span></a>
+                                        </th>
+                                        <th>
+                                            <a th:if="${search != ''}"
+                                               th:href="@{/admin/authors(field='username', direction=${direction == 'asc' ? 'desc' : 'asc'}, s=${search})}">
+                                                Username
+                                                <span th:if="${field eq 'username' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'username' && direction == 'desc'}">&#9660;</span>
+                                            </a>
+                                            <a th:if="${search == ''}"
+                                               th:href="@{/admin/authors(field='username', direction=${direction == 'asc' ? 'desc' : 'asc'})}">Username
+                                                <span th:if="${field eq 'username' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'username' && direction == 'desc'}">&#9660;</span></a>
+                                        </th>
+                                        <th>
+                                            <a th:if="${search != ''}"
+                                               th:href="@{/admin/authors(field='email', direction=${direction == 'asc' ? 'desc' : 'asc'}, s=${search})}">
+                                                Email
+                                                <span th:if="${field eq 'email' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'email' && direction == 'desc'}">&#9660;</span>
+                                            </a>
+                                            <a th:if="${search == ''}"
+                                               th:href="@{/admin/authors(field='email', direction=${direction == 'asc' ? 'desc' : 'asc'})}">Email
+                                                <span th:if="${field eq 'email' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'email' && direction == 'desc'}">&#9660;</span></a>
+                                        </th>
+                                        <th>
+                                            <a th:if="${search != ''}"
+                                               th:href="@{/admin/authors(field='created', direction=${direction == 'asc' ? 'desc' : 'asc'}, s=${search})}">
+                                                Created
+                                                <span th:if="${field eq 'created' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'created' && direction == 'desc'}">&#9660;</span>
+                                            </a>
+                                            <a th:if="${search == ''}"
+                                               th:href="@{/admin/authors(field='created', direction=${direction == 'asc' ? 'desc' : 'asc'})}">Created
+                                                <span th:if="${field eq 'created' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'created' && direction == 'desc'}">&#9660;</span></a>
+                                        </th>
+                                        <th>
+                                            <a th:if="${search != ''}"
+                                               th:href="@{/admin/authors(field='articleCount', direction=${direction == 'asc' ? 'desc' : 'asc'}, s=${search})}">
+                                                Articles
+                                                <span th:if="${field eq 'articleCount' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'articleCount' && direction == 'desc'}">&#9660;</span>
+                                            </a>
+                                            <a th:if="${search == ''}"
+                                               th:href="@{/admin/authors(field='articleCount', direction=${direction == 'asc' ? 'desc' : 'asc'})}">Articles
+                                                <span th:if="${field eq 'articleCount' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'articleCount' && direction == 'desc'}">&#9660;</span></a>
+                                        </th>
+                                        <th>
+                                            <a th:if="${search != ''}"
+                                               th:href="@{/admin/authors(field='subscriberCount', direction=${direction == 'asc' ? 'desc' : 'asc'}, s=${search})}">
+                                                Subscribers
+                                                <span th:if="${field eq 'subscriberCount' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'subscriberCount' && direction == 'desc'}">&#9660;</span>
+                                            </a>
+                                            <a th:if="${search == ''}"
+                                               th:href="@{/admin/authors(field='subscriberCount', direction=${direction == 'asc' ? 'desc' : 'asc'})}">Subscribers
+                                                <span th:if="${field eq 'subscriberCount' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'subscriberCount' && direction == 'desc'}">&#9660;</span></a>
+                                        </th>
+                                        <th>
+                                            <a th:if="${search != ''}"
+                                               th:href="@{/admin/authors(field='commentCount', direction=${direction == 'asc' ? 'desc' : 'asc'}, s=${search})}">
+                                                Comments
+                                                <span th:if="${field eq 'commentCount' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'commentCount' && direction == 'desc'}">&#9660;</span>
+                                            </a>
+                                            <a th:if="${search == ''}"
+                                               th:href="@{/admin/authors(field='commentCount', direction=${direction == 'asc' ? 'desc' : 'asc'})}">Comments
+                                                <span th:if="${field eq 'commentCount' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'commentCount' && direction == 'desc'}">&#9660;</span></a>
+                                        </th>
+                                        <th>Action</th>
+                                    <tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="author, it : ${authorsPage.content}">
+                                        <td>
+                                                <img alt="Avatar" class="rounded-circle" th:src="${author.avatarUrl}" width="30" height="30">
+                                        </td>
+                                        <td th:text="${author.fullName}"></td>
+                                        <td th:text="${author.username}"></td>
+                                        <td th:text="${author.email}"></td>
+                                        <td th:text="${#temporals.format(author.created, 'yyyy/MM/dd, HH:mm')}">183</td>
+                                        <td th:text="${author.articleCount}"></td>
+                                        <td th:text="${author.subscriberCount}"></td>
+                                        <td th:text="${author.commentCount}"></td>
+                                        <td>
+                                            <a th:href="@{/admin/author/{id}(id=${author.id})}"
+                                               class="btn btn-primary btn-sm">
+                                                <i class="fas fa-folder"></i> View
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                            <!-- /.card-body -->
+                            <div class="card-footer">
+
+                            </div>
+
+
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.container-fluid -->
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <th:block th:replace="~{user/template :: footer}"></th:block>
+
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+        <!-- Control sidebar content goes here -->
+    </aside>
+    <!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+<div th:insert="~{user/fragments :: common-scripts}"></div>
+</body>
+</html>
+

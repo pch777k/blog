@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{user/template :: head(title = 'Blog')}"></head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+    <!-- Main Sidebar Container -->
+    <th:block th:replace="~{user/template :: sidebar(${profile})}"></th:block>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <section class="content mt-3">
+            <div class="container-fluid">
+                <!-- /.row -->
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <!-- general form elements -->
+                        <div class="card card-primary">
+                            <div class="card-header">
+                                <h3 class="card-title">Create user</h3>
+                            </div>
+                            <!-- /.card-header -->
+                            <!-- form start -->
+                            <form method="post" th:object="${adminUserCreateDto}" action="/admin/user/create">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label for="firstName">First name</label>
+                                                <input th:field="*{firstName}" type="text" class="form-control" id="firstName"
+                                                       placeholder="Enter first name">
+                                                <small><span class="text text-danger" th:if="${#fields.hasErrors('firstName')}"
+                                                             th:errors="*{firstName}"></span></small>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label for="lastName">Last name</label>
+                                                <input th:field="*{lastName}"type="text" class="form-control" id="lastName"
+                                                       placeholder="Enter last name">
+                                                <small><span class="text text-danger" th:if="${#fields.hasErrors('lastName')}"
+                                                             th:errors="*{lastName}"></span></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label for="username">Username</label>
+                                                <input th:field="*{username}" type="text" class="form-control" id="username"
+                                                       placeholder="Enter username">
+                                                <small><span class="text text-danger" th:if="${#fields.hasErrors('username')}"
+                                                             th:errors="*{username}"></span></small>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label for="email">Email address</label>
+                                                <input th:field="*{email}" type="email" class="form-control" id="email"
+                                                       placeholder="Enter email">
+                                                <small><span class="text text-danger" th:if="${#fields.hasErrors('email')}"
+                                                             th:errors="*{email}"></span></small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label for="password">Password</label>
+                                                <input th:field="*{password}" type="password" class="form-control" id="password"
+                                                       placeholder="Enter password">
+                                                <small><span class="text text-danger" th:if="${#fields.hasErrors('password')}"
+                                                             th:errors="*{password}"></span></small>
+                                            </div>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="form-group">
+                                                <label for="confirmPassword">Confirm password</label>
+                                                <input th:field="*{confirmPassword}" type="password" class="form-control" id="confirmPassword"
+                                                       placeholder="Confirm password">
+                                                <small><span class="text text-danger" th:if="${#fields.hasErrors('confirmPassword')}"
+                                                             th:errors="*{confirmPassword}"></span></small>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <div class="form-group clearfix">
+                                                <th:block th:each="role : ${T(com.pch777.blog.identity.user.domain.model.Role).values()}">
+                                                    <div th:unless="${role eq T(com.pch777.blog.identity.user.domain.model.Role).ADMIN}"
+                                                         class="icheck-primary d-inline mr-3">
+                                                        <input th:field="*{role}" th:value="${role}" type="radio"
+                                                               th:id="'radio' + ${role}" th:name="roles"
+                                                               th:checked="${role == T(com.pch777.blog.identity.user.domain.model.Role).READER}">
+                                                        <label th:for="'radio' + ${role}" th:text="${role}"></label>
+
+                                                    </div>
+                                                </th:block>
+                                                <p><small><span class="text text-danger" th:if="${#fields.hasErrors('role')}"
+                                                             th:errors="*{role}"></span></small></p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                                <!-- /.card-body -->
+
+                                <div class="card-footer">
+                                    <button type="submit" class="btn btn-sm btn-primary">Create user</button>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <!-- /.content-wrapper -->
+
+    <th:block th:replace="~{user/template :: footer}"></th:block>
+
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+        <!-- Control sidebar content goes here -->
+    </aside>
+    <!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+
+<div th:insert="~{user/fragments :: common-scripts}"></div>
+
+
+<script>
+    $(document).on('click', '.deleteButton', function () {
+        let notificationId = $(this).data('notification-id');
+
+        $.ajax({
+            url: "/api/v1/notifications/" + notificationId,
+            type: 'DELETE',
+            success: function (response) {
+                console.log('Notification deleted successfully');
+                $(`.notification[data-notification-id="${notificationId}"]`).remove();
+                $('#timeline').load(location.href + ' #timeline');
+            },
+            error: function (xhr, status, error) {
+                console.error('Error during deleting notification:', error);
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

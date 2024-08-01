@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{user/template :: head(title = 'Blog')}"></head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+    >
+
+    <!-- Main Sidebar Container -->
+    <th:block th:replace="~{user/template :: sidebar(${profile})}"></th:block>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <section class="content mt-3">
+            <div class="container-fluid">
+                <!-- /.row -->
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <div th:if="${message != null}" class="alert alert-danger" role="alert">
+                            <i class="bi bi-exclamation-triangle"></i> <span th:text="${message.content}">Error during user edition!</span>
+                        </div>
+                        <div class="card card-widget widget-user-2">
+                            <!-- Add the bg color to the header using any of the bg-* classes -->
+                            <div class="widget-user-header bg-info">
+                                <div class="widget-user-image">
+                                    <img class="img-circle elevation-2" th:src="${updatedUser.avatarUrl}"
+                                         alt="User Avatar">
+                                </div>
+                                <!-- /.widget-user-image -->
+                                <h3 th:text="${updatedUser.fullName}" class="widget-user-username"></h3>
+
+                                <h5 th:text="${updatedUser.role}" class="widget-user-desc"></h5>
+
+                            </div>
+                            <div th:if="${userType == 'reader'}"
+                                 th:insert="~{admin/fragments :: readerForm(updatedUser = ${updatedUser}, adminUserUpdateDto = ${adminUserUpdateDto})}"></div>
+                            <div th:if="${userType == 'author'}"
+                                 th:insert="~{admin/fragments :: authorForm(updatedUser = ${updatedUser}, adminUserUpdateDto = ${adminUserUpdateDto})}"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <!-- /.content-wrapper -->
+
+    <th:block th:replace="~{user/template :: footer}"></th:block>
+
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+        <!-- Control sidebar content goes here -->
+    </aside>
+    <!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+
+<div th:insert="~{user/fragments :: common-scripts}"></div>
+
+
+</body>
+</html>
