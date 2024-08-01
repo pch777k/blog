@@ -32,15 +32,12 @@ public class DefaultPermissions {
 
     private Set<Permission> getReaderPermissions() {
         return permissionService.findPermissionsByType(Set.of(
-                ARTICLE_READ,
                 ARTICLE_LIKE,
-                COMMENT_READ,
                 COMMENT_UPDATE,
                 COMMENT_CREATE,
                 COMMENT_DELETE,
                 MESSAGE_SEND,
                 MESSAGE_RECEIVE,
-                USER_READ,
                 USER_UPDATE,
                 USER_SUBSCRIBE
 
@@ -49,18 +46,15 @@ public class DefaultPermissions {
 
     private Set<Permission> getAuthorPermissions() {
         return permissionService.findPermissionsByType(Set.of(
-                ARTICLE_READ,
                 ARTICLE_CREATE,
                 ARTICLE_UPDATE,
                 ARTICLE_DELETE,
                 ARTICLE_LIKE,
-                COMMENT_READ,
                 COMMENT_UPDATE,
                 COMMENT_CREATE,
                 COMMENT_DELETE,
                 MESSAGE_SEND,
                 MESSAGE_RECEIVE,
-                USER_READ,
                 USER_UPDATE
 
         ));
@@ -68,18 +62,15 @@ public class DefaultPermissions {
 
     private Set<Permission> getAdminPermissions() {
         return permissionService.findPermissionsByType(Set.of(
-                ARTICLE_READ,
                 ARTICLE_CREATE,
                 ARTICLE_UPDATE,
                 ARTICLE_DELETE,
                 ARTICLE_LIKE,
-                COMMENT_READ,
                 COMMENT_UPDATE,
                 COMMENT_CREATE,
                 COMMENT_DELETE,
                 MESSAGE_SEND,
                 MESSAGE_RECEIVE,
-                USER_READ,
                 USER_CREATE,
                 USER_UPDATE,
                 USER_DELETE
@@ -95,7 +86,6 @@ public class DefaultPermissions {
                 .collect(Collectors.toSet());
 
         permissions.add(createPermissionDisplayDto("CREATE", permissionTypes, ARTICLE_CREATE, COMMENT_CREATE, null, USER_CREATE));
-        permissions.add(createPermissionDisplayDto("READ", permissionTypes, ARTICLE_READ, COMMENT_READ, null, USER_READ));
         permissions.add(createPermissionDisplayDto("UPDATE", permissionTypes, ARTICLE_UPDATE, COMMENT_UPDATE, null, USER_UPDATE));
         permissions.add(createPermissionDisplayDto("DELETE", permissionTypes, ARTICLE_DELETE, COMMENT_DELETE, null, USER_DELETE));
         permissions.add(createPermissionDisplayDto("SEND", permissionTypes, null, null, MESSAGE_SEND, null));
