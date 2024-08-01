@@ -21,12 +21,6 @@ public class NotificationApiController {
         return notificationService.getNotificationsByUserId(id);
     }
 
-//    @PutMapping("/{id}/display")
-//    public ResponseEntity<Void> markNotificationAsRead(@PathVariable UUID id) {
-//        notificationService.markNotificationAsRead(id);
-//        return ResponseEntity.ok().build();
-//    }
-
     @DeleteMapping("{id}")
     public ResponseEntity<Void> deleteNotificationById(@PathVariable UUID id) {
         notificationService.deleteById(id);

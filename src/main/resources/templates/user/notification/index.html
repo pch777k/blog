@@ -1,0 +1,121 @@
+
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{user/template :: head(title = 'Blog')}"></head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+  <!-- Main Sidebar Container -->
+    <th:block th:replace="~{user/template :: sidebar(${profile})}"></th:block>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+      <div class="content-header">
+          <div class="container-fluid">
+              <div class="row mb-2">
+                  <div class="col-sm-6">
+                      <h1 class="m-0">Timeline</h1>
+                  </div><!-- /.col -->
+              </div><!-- /.row -->
+          </div><!-- /.container-fluid -->
+      </div>
+    <!-- Main content -->
+    <section class="content">
+      <div class="container-fluid">
+        <div class="row">
+
+          <!-- /.col -->
+          <div th:if="${timelineDays.isEmpty()}" class="col-md-4">
+              <div class="card">
+                  <div class="card-body text-info">
+                      <span th:if="${search == null || search.isEmpty()}">You have no notifications.</span>
+                  </div>
+              </div>
+          </div>
+            <div th:unless="${timelineDays.isEmpty()}" class="col-md-12">
+              <div  class="card">
+              <div class="card-body">
+                    <div class="timeline timeline-inverse">
+
+                        <th:block th:each="timeLineDay : ${timelineDays}">
+                            <div class="time-label">
+                                <span th:text="${#temporals.format(timeLineDay.localDate, 'dd MMM. yyyy')}" class="bg-info"></span>
+                            </div>
+                            <div th:each="notification : ${timeLineDay.notifications}" class="notification" th:attr="data-notification-id=${notification.id}">
+                                <i th:class="${notificationIcons[notification.notificationType]}"></i>
+                                <div class="timeline-item">
+                                    <span th:text="${#temporals.format(notification.created, 'HH:mm')}" class="time"><i class="far fa-clock"></i></span>
+                                    <h3 class="timeline-header" th:text="${notification.notificationType.toString()}"></h3>
+                                    <div th:text="${notification.message}" class="timeline-body"></div>
+                                    <div class="timeline-footer">
+                                        <button th:attr="data-notification-id=${notification.id}" class="btn btn-danger btn-sm deleteButton">Delete</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </th:block>
+                    </div>
+
+              </div><!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+          </div>
+          <!-- /.col -->
+        </div>
+        <!-- /.row -->
+      </div><!-- /.container-fluid -->
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+
+  <th:block th:replace="~{user/template :: footer}"></th:block>
+
+  <!-- Control Sidebar -->
+  <aside class="control-sidebar control-sidebar-dark">
+    <!-- Control sidebar content goes here -->
+  </aside>
+  <!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+
+<div th:insert="~{user/fragments :: common-scripts}"></div>
+
+
+<script>
+  // $(document).on('click', '.deleteButton', function () {
+  //     let notificationId = $(this).data('notification-id');
+  //
+  //     $.ajax({
+  //         url: "/api/v1/notifications/" + notificationId,
+  //         type: 'DELETE',
+  //         success: function (response) {
+  //             console.log('Notification deleted successfully');
+  //             $(`.notification[data-notification-id="${notificationId}"]`).remove();
+  //             $('#timeline').load(location.href + ' #timeline');
+  //         },
+  //         error: function (xhr, status, error) {
+  //             console.error('Error during deleting notification:', error);
+  //         }
+  //     });
+  // });
+  $(document).on('click', '.deleteButton', function () {
+      let notificationId = $(this).data('notification-id');
+
+      $.ajax({
+          url: "/api/v1/notifications/" + notificationId,
+          type: 'DELETE',
+          success: function (response) {
+              console.log('Notification deleted successfully');
+              $(`.notification[data-notification-id="${notificationId}"]`).remove();
+          },
+          error: function (xhr, status, error) {
+              console.error('Error during deleting notification:', error);
+          }
+      });
+  });
+</script>
+
+</body>
+</html>

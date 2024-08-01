@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{user/template :: head(title = 'Blog')}"></head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+    <!-- Main Sidebar Container -->
+    <th:block th:replace="~{user/template :: sidebar(${profile})}"></th:block>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+        <section class="content">
+            <div class="container-fluid">
+                <div class="row mt-3">
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box bg-info">
+                            <span class="info-box-icon"><i class="fa fa-newspaper"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text">Articles</span>
+                                <span th:text="${statistics.totalArticles}" class="info-box-number"></span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box bg-success">
+                            <span class="info-box-icon"><i class="far fa-thumbs-up"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text">Likes</span>
+                                <span th:text="${statistics.totalLikes}" class="info-box-number"></span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box bg-fuchsia">
+                            <span class="info-box-icon text-white"><i class="fa fa-bell"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text text-white">Subscriptions</span>
+                                <span th:text="${statistics.totalSubscriptions}" class="info-box-number text-white"></span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box bg-danger">
+                            <span class="info-box-icon"><i class="fas fa-comment"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text">Comments</span>
+                                <span th:text="${statistics.totalComments}" class="info-box-number"></span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box bg-indigo">
+                            <span class="info-box-icon"><i class="fas fa-user"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text">Readers</span>
+                                <span th:text="${statistics.totalReaders}" class="info-box-number"></span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box bg-secondary">
+                            <span class="info-box-icon"><i class="fas fa-user"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text">Authors</span>
+                                <span th:text="${statistics.totalAuthors}" class="info-box-number">41,410</span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box bg-primary">
+                            <span class="info-box-icon"><i class="fas fa-users"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text">Users</span>
+                                <span th:text="${statistics.totalAuthors + statistics.totalReaders}" class="info-box-number"></span>
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-md-3 col-sm-6 col-12">
+                        <div class="info-box bg-orange ">
+                            <span class="info-box-icon text-white"><i class="fa fa-hashtag"></i></span>
+
+                            <div class="info-box-content">
+                                <span class="info-box-text text-white">Tags</span>
+                                <span th:text="${statistics.totalTags}" class="info-box-number text-white"></span>
+
+                            </div>
+                            <!-- /.info-box-content -->
+                        </div>
+                        <!-- /.info-box -->
+                    </div>
+                    <!-- /.col -->
+                </div>
+            </div>
+            <!-- Main row -->
+
+
+            <!-- /.row -->
+            <!-- /.container-fluid -->
+        </section>
+        <section class="content">
+            <div class="container-fluid">
+                <section class="content-header">
+                    <div class="container-fluid">
+                        <div class="row mb-2">
+                            <div class="col-sm-6">
+                                <h1>Notifications</h1>
+                            </div>
+                        </div>
+                    </div><!-- /.container-fluid -->
+                </section>
+                <!-- /.row -->
+                <div class="row">
+                    <div class="col-12">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div th:if="${notificationPage.empty}" class="card">
+                                    <div class="card-body text-info">
+                                        <span th:if="${search == null || search.isEmpty()}">You have no notifications.</span>
+                                        <th:block th:unless="${search == null || search.isEmpty()}">
+                                            Result not found for : '<span th:text="${search}"></span>'
+                                            <a th:href="@{/admin/dashboard}" class="btn btn-primary btn-sm ml-2">
+                                                <i class="fa fa-times p-0"></i>
+                                            </a>
+                                        </th:block>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div th:unless="${notificationPage.empty}" class="card">
+                            <div class="card-header">
+                                <th:block th:unless="${search == null || search.isEmpty()}">
+                                    Result found for : '<span th:text="${search}"></span><span class="mr-2">'</span>
+                                    <a th:href="@{/admin/dashboard}" class="btn btn-primary btn-sm">
+                                        <i class="fa fa-times p-0"></i>
+                                    </a>
+                                </th:block>
+                                <div class="card-tools">
+                                    <form role="search"
+                                          th:action="@{'/admin/dashboard'}">
+                                        <div class="input-group input-group-sm" style="width: 250px;">
+                                            <input th:value="${search}" type="text" name="s"
+                                                   class="form-control float-right" placeholder="Search" required>
+
+                                            <div class="input-group-append">
+                                                <button type="submit" class="btn btn-default">
+                                                    <i class="fas fa-search"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </form>
+
+                                </div>
+                            </div>
+                            <!-- /.card-header -->
+                            <div th:unless="${notificationPage.empty}" class="card-body table-responsive p-0">
+                                <table class="table table-hover text-nowrap">
+                                    <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>
+                                            <a th:if="${search != ''}"
+                                               th:href="@{/admin/dashboard(field='created', direction=${direction == 'asc' ? 'desc' : 'asc'}, s=${search})}">
+                                                Created
+                                                <span th:if="${field eq 'created' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'created' && direction == 'desc'}">&#9660;</span>
+                                            </a>
+                                            <a th:if="${search == ''}"
+                                               th:href="@{/admin/dashboard(field='created', direction=${direction == 'asc' ? 'desc' : 'asc'})}">Created
+                                                <span th:if="${field eq 'created' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'created' && direction == 'desc'}">&#9660;</span></a>
+                                        </th>
+                                        <th>
+                                            <a th:if="${search != ''}"
+                                               th:href="@{/admin/dashboard(field='user.lastName', direction=${direction == 'asc' ? 'desc' : 'asc'}, s=${search})}">
+                                                Name
+                                                <span th:if="${field eq 'user.lastName' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'user.lastName' && direction == 'desc'}">&#9660;</span>
+                                            </a>
+                                            <a th:if="${search == ''}"
+                                               th:href="@{/admin/dashboard(field='user.lastName', direction=${direction == 'asc' ? 'desc' : 'asc'})}">Name
+                                                <span th:if="${field eq 'user.lastName' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'user.lastName' && direction == 'desc'}">&#9660;</span></a>
+                                        </th>
+                                        <th>
+                                            <a th:if="${search != ''}"
+                                               th:href="@{/admin/dashboard(field='message', direction=${direction == 'asc' ? 'desc' : 'asc'}, s=${search})}">
+                                                Content
+                                                <span th:if="${field eq 'message' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'message' && direction == 'desc'}">&#9660;</span>
+                                            </a>
+                                            <a th:if="${search == ''}"
+                                               th:href="@{/admin/dashboard(field='message', direction=${direction == 'asc' ? 'desc' : 'asc'})}">Message
+                                                <span th:if="${field eq 'message' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'message' && direction == 'desc'}">&#9660;</span></a>
+                                        </th>
+                                        <th>
+                                            <a th:if="${search != ''}"
+                                               th:href="@{/admin/dashboard (field='notificationType', direction=${direction == 'asc' ? 'desc' : 'asc'}, s=${search})}">
+                                                Type
+                                                <span th:if="${field eq 'notificationType' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'notificationType' && direction == 'desc'}">&#9660;</span>
+                                            </a>
+                                            <a th:if="${search == ''}"
+                                               th:href="@{/admin/dashboard (field='notificationType', direction=${direction == 'asc' ? 'desc' : 'asc'})}">Type
+                                                <span th:if="${field eq 'notificationType' && direction == 'asc'}">&#9650;</span>
+                                                <span th:if="${field eq 'notificationType' && direction == 'desc'}">&#9660;</span></a>
+                                        </th>
+
+                                    <tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="notification, it : ${notificationPage.content}">
+                                        <td th:text="${currentPageNumber * size + it.index + 1}"></td>
+                                        <td th:text="${#temporals.format(notification.created, 'yyyy/MM/dd, HH:mm')}"></td>
+                                        <td th:text="${notification.user.fullName}"></td>
+                                        <td th:text="${#strings.length(notification.message) > 100 ? #strings.substring(notification.message, 0, 100) + '...' : notification.message}"></td>
+                                        <td th:text="${notification.notificationType}"></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                            <!-- /.card-body -->
+                            <div th:unless="${notificationPage.empty}" class="card-footer">
+                                <div class="row">
+                                    <span class="mr-4"
+                                          th:text="'Showing ' + (${notificationPage.number} * ${notificationPage.size} + 1) + ' to ' + (${notificationPage.number} * ${notificationPage.size} + ${notificationPage.size} &gt; ${notificationPage.totalElements} ? ${notificationPage.totalElements} : ${notificationPage.number} * ${notificationPage.size} + ${notificationPage.size}) + ' of ' + ${notificationPage.totalElements} + ' entries'"></span>
+                                    <div th:replace="~{blog/template :: pagination-author-articles(href='/admin/dashboard',
+                                                                                                    currentPage=${currentPageNumber},
+                                                                                                    totalPages=${totalPagesNumber},
+                                                                                                    search=${search == '' ? null : search},
+                                                                                                    field=${field},
+                                                                                                    direction=${direction},
+                                                                                                    size=${size})}">
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+
+                        </div>
+                        <!-- /.card -->
+                    </div>
+                </div>
+                <!-- /.row -->
+            </div>
+            <!-- /.container-fluid -->
+        </section>
+
+
+    </div>
+    <!-- /.content-wrapper -->
+
+    <th:block th:replace="~{user/template :: footer}"></th:block>
+
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+        <!-- Control sidebar content goes here -->
+    </aside>
+    <!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+
+<div th:insert="~{user/fragments :: common-scripts}"></div>
+
+
+<script>
+    $(document).on('click', '.deleteButton', function () {
+        let notificationId = $(this).data('notification-id');
+
+        $.ajax({
+            url: "/api/v1/notifications/" + notificationId,
+            type: 'DELETE',
+            success: function (response) {
+                console.log('Notification deleted successfully');
+                $(`.notification[data-notification-id="${notificationId}"]`).remove();
+                $('#timeline').load(location.href + ' #timeline');
+            },
+            error: function (xhr, status, error) {
+                console.error('Error during deleting notification:', error);
+            }
+        });
+    });
+</script>
+</body>
+</html>

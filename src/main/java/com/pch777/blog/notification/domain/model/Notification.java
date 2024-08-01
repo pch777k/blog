@@ -37,6 +37,4 @@ public class Notification {
     @Column(nullable = false)
     private boolean isRead;
 
-//    @Column(name = "is_displayed")
-//    private boolean isDisplayed;
 }

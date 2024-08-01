@@ -31,7 +31,6 @@ public class NotificationService {
         notification.setUser(user);
         notification.setMessage(message);
         notification.setCreated(LocalDateTime.now());
-        //notification.setDisplayed(false);
         notification.setNotificationType(notificationType);
         notificationRepository.save(notification);
     }
@@ -45,7 +44,6 @@ public class NotificationService {
             notification.setUser(subscription.getReader());
             notification.setMessage("New article published by " + article.getAuthor().getFullName() + ": " + article.getTitle());
             notification.setCreated(LocalDateTime.now());
-           // notification.setDisplayed(false);
             notification.setNotificationType(NotificationType.ARTICLE);
             notificationRepository.save(notification);
         }
@@ -66,13 +64,6 @@ public class NotificationService {
     public void deleteById(UUID id) {
         notificationRepository.deleteById(id);
     }
-
-//    @Transactional
-//    public void markNotificationAsRead(UUID id) {
-//        Notification notification = notificationRepository.findById(id)
-//                .orElseThrow(() -> new EntityNotFoundException("Notification not found with id: " + id));
-//        notification.setDisplayed(true);
-//    }
 
     @Transactional(readOnly = true)
     public Page<Notification> getAllNotifications(String search, Pageable pageable) {
