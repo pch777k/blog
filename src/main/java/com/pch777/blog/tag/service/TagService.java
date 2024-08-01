@@ -1,7 +1,7 @@
 package com.pch777.blog.tag.service;
 
-import com.pch777.blog.exception.ForbiddenException;
-import com.pch777.blog.exception.TagNotFoundException;
+import com.pch777.blog.exception.authentication.ForbiddenException;
+import com.pch777.blog.exception.resource.TagNotFoundException;
 import com.pch777.blog.identity.user.domain.model.Role;
 import com.pch777.blog.identity.user.domain.model.User;
 import com.pch777.blog.identity.user.service.UserService;

@@ -3,7 +3,7 @@ package com.pch777.blog.category.service;
 import com.pch777.blog.category.domain.model.Category;
 import com.pch777.blog.category.domain.repository.CategoryRepository;
 import com.pch777.blog.category.dto.CategoryDto;
-import com.pch777.blog.exception.CategoryNotFoundException;
+import com.pch777.blog.exception.resource.CategoryNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
