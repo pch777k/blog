@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Fragments</title>
+</head>
+<body>
+<th:block th:fragment="readerForm(updatedUser, adminUserUpdateDto)">
+    <form th:object="${adminUserUpdateDto}"
+          th:action="@{/admin/reader/{updatedUserId}/update(updatedUserId=${updatedUser.id})}" method="post">
+        <div class="card-body p-0">
+            <table class="table table-sm mb-0">
+                <tbody>
+                <tr>
+                    <td>first name</td>
+                    <td>
+                        <input th:field="*{firstName}" type="text"
+                               class="form-control form-control-sm">
+                        <small><span class="text text-danger"
+                                     th:if="${#fields.hasErrors('firstName')}"
+                                     th:errors="*{firstName}"></span></small>
+                    </td>
+                </tr>
+                <tr>
+                    <td>last name</td>
+                    <td>
+                        <input th:field="*{lastName}" type="text" id="lastName"
+                               class="form-control form-control-sm">
+                        <small><span class="text text-danger"
+                                     th:if="${#fields.hasErrors('lastName')}"
+                                     th:errors="*{lastName}"></span></small>
+                    </td>
+                </tr>
+                <tr>
+                    <td>avatarUrl</td>
+                    <td><input th:field="*{avatarUrl}" type="text"
+                               class="form-control form-control-sm"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer">
+            <div class="flex-container">
+                <a th:href="@{/admin/reader/{updatedUserId} (updatedUserId=${updatedUser.id})}"
+                   class="btn btn-sm btn-info mr-2">
+                    Back
+                </a>
+                <button type="submit" class="btn btn-sm btn-info mr-2">Update</button>
+            </div>
+        </div>
+    </form>
+</th:block>
+
+<th:block th:fragment="authorForm(updatedUser, adminUserUpdateDto)">
+    <form th:object="${adminUserUpdateDto}"
+          th:action="@{/admin/author/{updatedUserId}/update(updatedUserId=${updatedUser.id})}" method="post">
+        <div class="card-body p-0">
+            <table class="table table-sm mb-0">
+                <tbody>
+                <tr>
+                    <td>first name</td>
+                    <td>
+                        <input th:field="*{firstName}" type="text"
+                               class="form-control form-control-sm">
+                        <small><span class="text text-danger"
+                                     th:if="${#fields.hasErrors('firstName')}"
+                                     th:errors="*{firstName}"></span></small>
+                    </td>
+                </tr>
+                <tr>
+                    <td>last name</td>
+                    <td>
+                        <input th:field="*{lastName}" type="text" id="lastName"
+                               class="form-control form-control-sm">
+                        <small><span class="text text-danger"
+                                     th:if="${#fields.hasErrors('lastName')}"
+                                     th:errors="*{lastName}"></span></small>
+                    </td>
+                </tr>
+                <tr>
+                    <td>bio</td>
+                    <td><input th:field="*{bio}" type="text"
+                               class="form-control form-control-sm"></td>
+                </tr>
+                <tr>
+                    <td>avatarUrl</td>
+                    <td><input th:field="*{avatarUrl}" type="text"
+                               class="form-control form-control-sm"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer">
+            <div class="flex-container">
+                <a th:href="@{/admin/author/{updatedUserId} (updatedUserId=${updatedUser.id})}"
+                   class="btn btn-sm btn-info mr-2">
+                    Back
+                </a>
+                <button type="submit" class="btn btn-sm btn-info mr-2">Update</button>
+            </div>
+        </div>
+    </form>
+</th:block>
+</body>
+</html>
