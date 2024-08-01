@@ -2,12 +2,11 @@ package com.pch777.blog.identity.user.service;
 
 import com.pch777.blog.common.configuration.BlogConfiguration;
 import com.pch777.blog.common.dto.StatisticsDto;
-import com.pch777.blog.exception.ForbiddenException;
-import com.pch777.blog.exception.UserNotFoundException;
+import com.pch777.blog.exception.authentication.ForbiddenException;
+import com.pch777.blog.exception.resource.UserNotFoundException;
 import com.pch777.blog.identity.author.domain.model.Author;
 import com.pch777.blog.identity.author.domain.repository.AuthorRepository;
 import com.pch777.blog.identity.permission.domain.model.Permission;
-import com.pch777.blog.identity.permission.domain.model.PermissionType;
 import com.pch777.blog.identity.permission.domain.repository.PermissionRepository;
 import com.pch777.blog.identity.permission.service.DefaultPermissions;
 import com.pch777.blog.identity.reader.domain.model.Reader;
@@ -16,11 +15,13 @@ import com.pch777.blog.identity.user.domain.model.Role;
 import com.pch777.blog.identity.user.domain.model.User;
 import com.pch777.blog.identity.user.domain.model.VerificationToken;
 import com.pch777.blog.identity.user.domain.repository.UserRepository;
-import com.pch777.blog.identity.user.dto.*;
+import com.pch777.blog.identity.user.dto.AdminUserCreateDto;
+import com.pch777.blog.identity.user.dto.ChangePasswordDto;
+import com.pch777.blog.identity.user.dto.UserRegisterDto;
+import com.pch777.blog.identity.user.dto.UserUpdateDto;
 import com.pch777.blog.mail.EmailService;
 import com.pch777.blog.notification.domain.model.NotificationType;
 import com.pch777.blog.notification.service.NotificationService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -35,6 +36,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.pch777.blog.identity.permission.domain.model.PermissionType.MESSAGE_RECEIVE;
+import static com.pch777.blog.identity.permission.domain.model.PermissionType.MESSAGE_SEND;
 import static com.pch777.blog.identity.user.domain.model.Role.*;
 
 @RequiredArgsConstructor
@@ -53,18 +56,9 @@ public class UserService {
     private final DefaultPermissions defaultPermissions;
     private final NotificationService notificationService;
 
-//    @Transactional
-//    public User registerUser(UserRegisterDto userRegisterDto, String verificationBaseUrl) throws Exception {
-//        User user = createUserByRole(userRegisterDto, Role.READER);
-//        VerificationToken token = verificationTokenService.createVerificationToken(user);
-//        emailService.sendVerificationEmail(user.getEmail(), token.getToken(), verificationBaseUrl);
-//        return user;
-//    }
-
     @Transactional
-    public User registerUser(UserRegisterDto userRegisterDto, String baseVerificationUrl) throws Exception {
+    public User registerUser(UserRegisterDto userRegisterDto, String baseVerificationUrl) {
         User user = createUserByRole(userRegisterDto, Role.READER);
-        userRepository.save(user);
         VerificationToken token = verificationTokenService.createVerificationToken(user);
         emailService.sendVerificationEmail(user.getEmail(), token.getToken(), baseVerificationUrl);
         notificationService.createNotification(user,
@@ -74,9 +68,9 @@ public class UserService {
 
     @Transactional
     @PreAuthorize("hasRole('ADMIN')")
-    public User createUser(UserCreateByAdminDto userCreateByAdminDto, String baseVerificationUrl) throws Exception {
+    public User createUser(AdminUserCreateDto adminUserCreateDto, String baseVerificationUrl) {
         User creator = getUserCreator();
-        User user = createUserByRole(userCreateByAdminDto, userCreateByAdminDto.getRole());
+        User user = createUserByRole(adminUserCreateDto, adminUserCreateDto.getRole());
         VerificationToken token = verificationTokenService.createVerificationToken(user);
         emailService.sendVerificationEmail(user.getEmail(), token.getToken(), baseVerificationUrl);
         notificationService.createNotification(creator,
@@ -121,35 +115,6 @@ public class UserService {
         return userRepository.save(user);
     }
 
-
-    @Transactional
-    public User addPermissionToUser(UUID userId, PermissionType permissionType) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User", userId));
-//        if(!roleService.isPermissionAppropriateForRole(user.getRole().name(), permissionType)) {
-//            throw new ForbiddenException("This permission is not available for this role");
-//        }
-        Permission permission = permissionRepository.findByPermissionType(permissionType)
-                .orElseThrow(() -> new EntityNotFoundException("Permission not found: " + permissionType));
-
-        user.addPermission(permission);
-
-        return userRepository.save(user);
-    }
-
-    @Transactional
-    public User deletePermissionFromUser(UUID userId, PermissionType permissionType) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User", userId));
-        Permission permission = permissionRepository.findByPermissionType(permissionType)
-                .orElseThrow(() -> new EntityNotFoundException("Permission not found: " + permissionType));
-
-        user.removePermission(permission);
-
-        return userRepository.save(user);
-    }
-
-
     @Transactional(readOnly = true)
     public List<User> getUsers() {
         return userRepository.findAll();
@@ -170,7 +135,6 @@ public class UserService {
         return userRepository.findByRole(READER);
     }
 
-    @Transactional(readOnly = true)
     public User getUserById(UUID id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User", id));
@@ -182,21 +146,8 @@ public class UserService {
                 .orElseThrow(() -> new UserNotFoundException("User", username));
     }
 
-//    @Transactional
-//    public User updateUser(UUID id, UserRegisterDto userRegisterDto) {
-//        User updatedUser = userRepository.findById(id)
-//                .orElseThrow(() -> new UserNotFoundException("User", id));
-//        updatedUser.setFirstName(userRegisterDto.getFirstName());
-//        updatedUser.setLastName(userRegisterDto.getLastName());
-//        updatedUser.setUsername(userRegisterDto.getUsername());
-//        updatedUser.setPassword(userRegisterDto.getPassword());
-//        updatedUser.setEmail(userRegisterDto.getEmail());
-//
-//        return userRepository.save(updatedUser);
-//    }
-
     @Transactional
-    @PreAuthorize("hasAnyRole('ROLE_AUTHOR','ROLE_ADMIN') and hasAuthority('USER_UPDATE')")
+    @PreAuthorize("hasAuthority('USER_UPDATE')")
     public User updateUser(UUID id, UserUpdateDto userUpdateDto) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User", id));
@@ -248,29 +199,6 @@ public class UserService {
     }
 
     @Transactional
-    public User recoverPassword(UUID userId, RecoverPasswordDto recoverPasswordDto) {
-
-//        if (authentication == null || !authentication.isAuthenticated()) {
-//            throw new UnauthorizedException("You must be logged in to change your password");
-//        }
-
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException("User", userId));
-//        UserPrincipal userDetails = (UserPrincipal) authentication.getPrincipal();
-//        if (!userDetails.getUsername().equals(user.getUsername())) {
-//            throw new ForbiddenException("You are not authorized to change this user's password");
-//        }
-
-//        if (!passwordEncoder.matches(changePasswordDto.getOldPassword(), user.getPassword())) {
-//            throw new IncorrectOldPasswordException("Incorrect old password");
-//        }
-
-        String recoverPasswordEncoded = passwordEncoder.encode(recoverPasswordDto.getNewPassword());
-        user.setPassword(recoverPasswordEncoded);
-        return userRepository.save(user);
-    }
-
-    @Transactional
     @PreAuthorize("hasRole('ADMIN')")
     public void updatePermissions(UUID userId, Set<UUID> permissions) {
         User creator = getUserCreator();
@@ -315,5 +243,15 @@ public class UserService {
 
     public StatisticsDto getStatistics() {
         return userRepository.getStatistics();
+    }
+
+    public boolean canSendMessages(UUID userId) {
+        User user = getUserById(userId);
+        return user.hasPermission(MESSAGE_SEND);
+    }
+
+    public boolean canReceiveMessages(UUID userId) {
+        User user = getUserById(userId);
+        return user.hasPermission(MESSAGE_RECEIVE);
     }
 }

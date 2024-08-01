@@ -1,6 +1,6 @@
 package com.pch777.blog.identity.author.service;
 
-import com.pch777.blog.exception.UserNotFoundException;
+import com.pch777.blog.exception.resource.UserNotFoundException;
 import com.pch777.blog.identity.author.domain.model.Author;
 import com.pch777.blog.identity.author.domain.repository.AuthorRepository;
 import lombok.RequiredArgsConstructor;

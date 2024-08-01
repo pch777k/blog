@@ -1,10 +1,9 @@
 package com.pch777.blog.identity.user.dto;
 
-import com.pch777.blog.identity.user.domain.model.Role;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import com.pch777.blog.validation.PasswordMatches;
+import com.pch777.blog.validation.UniqueEmail;
+import com.pch777.blog.validation.UniqueUsername;
+import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,29 +11,33 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
+@PasswordMatches
 public class UserRegisterDto {
 
-    @NotBlank
-    @Size(max = 50)
+    @NotBlank(message = "must not be blank")
+    @Size(message = "size must be between {min} and {max}", min = 2, max = 50)
     private String firstName;
 
-    @NotBlank
-    @Size(max = 50)
+    @NotBlank(message = "must not be blank")
+    @Size(message = "size must be between {min} and {max}", min = 2, max = 50)
     private String lastName;
 
-    @NotBlank
-    @Size(min = 3, max = 50)
-    @Pattern(regexp = "\\S+", message = "Username cannot contain spaces")
+    @NotBlank(message = "must not be blank")
+    @Size(message = "size must be between {min} and {max}", min = 3, max = 50)
+    @Pattern(regexp = "\\S+", message = "cannot contain spaces")
+    @UniqueUsername
     private String username;
 
-    @NotBlank
-    @Email
-    @Size(max = 100)
+    @NotBlank(message = "must not be blank")
+    @Email(message = "must be a well-formed email address")
+    @Size(max = 100, message = "must be at most {max} characters long")
+    @UniqueEmail
     private String email;
 
-    @NotBlank
-    @Size(min = 3, max = 50)
+    @NotBlank(message = "must not be blank")
+    @Size(message = "size must be between {min} and {max}", min = 3, max = 50)
     private String password;
 
-    private Role role;
+    private String confirmPassword;
+
 }
