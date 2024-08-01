@@ -17,8 +17,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.UUID;
 
 import static com.pch777.blog.common.controller.ControllerUtils.addPaginationAttributes;
 import static com.pch777.blog.common.controller.ControllerUtils.paging;
@@ -61,6 +64,12 @@ public class ArticleAdminViewController extends ProfileCommonViewController {
         model.addAttribute("summaryArticlesPage", summaryArticlesPage);
 
         return "admin/article/index";
+    }
+
+    @GetMapping("{id}/delete")
+    public String delete(@PathVariable UUID id, @AuthenticationPrincipal UserDetails userDetails) {
+        articleService.deleteArticle(id, userDetails.getUsername());
+        return "redirect:/admin/articles";
     }
 
 }

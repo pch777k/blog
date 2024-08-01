@@ -1,14 +1,13 @@
 package com.pch777.blog.article.controller;
 
 import com.pch777.blog.article.domain.model.Article;
-import com.pch777.blog.article.domain.model.UserArticleLike;
 import com.pch777.blog.article.dto.ArticleDto;
 import com.pch777.blog.article.dto.ArticleShortDto;
 import com.pch777.blog.article.dto.ArticleSummaryDto;
 import com.pch777.blog.article.service.ArticleService;
 import com.pch777.blog.article.service.UserArticleLikeService;
 import com.pch777.blog.common.configuration.BlogConfiguration;
-import com.pch777.blog.exception.UserLikedException;
+import com.pch777.blog.exception.validation.UserLikedException;
 import com.pch777.blog.identity.user.domain.model.User;
 import com.pch777.blog.identity.user.service.UserService;
 import jakarta.validation.Valid;
@@ -33,6 +32,7 @@ import java.util.*;
 @RestController
 public class ArticleApiController {
 
+    public static final String MESSAGE = "message";
     private final ArticleService articleService;
     private final UserService userService;
     private final UserArticleLikeService userArticleLikeService;
@@ -87,7 +87,7 @@ public class ArticleApiController {
     public ResponseEntity<Object> likeArticle(@PathVariable UUID id,
                                               @AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap("message", "Unauthorized access."));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Collections.singletonMap(MESSAGE, "Unauthorized access."));
         }
 
         User user = userService.getUserByUsername(userDetails.getUsername());
@@ -95,16 +95,16 @@ public class ArticleApiController {
 
         try {
             userArticleLikeService.likeArticle(user, article);
-            long updatedLikesCount = article.getStats().getLikes(); // Zakładamy, że masz metodę do pobierania liczby polubień
+            long updatedLikesCount = article.getStats().getLikes();
 
             Map<String, Object> response = new HashMap<>();
-            response.put("message", "Like added successfully");
+            response.put(MESSAGE, "Like added successfully");
             response.put("articleId", article.getId());
             response.put("likesCount", updatedLikesCount);
 
             return ResponseEntity.ok(response);
         } catch (UserLikedException ex) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(Collections.singletonMap("message", "User already liked the article."));
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Collections.singletonMap(MESSAGE, "User already liked the article."));
         }
     }
 

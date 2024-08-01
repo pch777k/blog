@@ -6,9 +6,9 @@ import com.pch777.blog.article.domain.repository.ArticleRepository;
 import com.pch777.blog.article.domain.repository.ArticleStatsRepository;
 import com.pch777.blog.article.dto.*;
 import com.pch777.blog.common.configuration.BlogConfiguration;
-import com.pch777.blog.exception.ArticleNotFoundException;
-import com.pch777.blog.exception.ForbiddenException;
-import com.pch777.blog.exception.UnauthorizedException;
+import com.pch777.blog.exception.resource.ArticleNotFoundException;
+import com.pch777.blog.exception.authentication.ForbiddenException;
+import com.pch777.blog.exception.authentication.UnauthorizedException;
 import com.pch777.blog.notification.domain.model.NotificationType;
 import com.pch777.blog.notification.service.NotificationService;
 import com.pch777.blog.identity.author.domain.model.Author;
@@ -102,7 +102,7 @@ public class ArticleService {
     }
 
     @Transactional
-    @PreAuthorize("hasAnyRole('AUTHOR','ADMIN')")
+    @PreAuthorize("hasAnyRole('AUTHOR','ADMIN') and hasAuthority('ARTICLE_CREATE')")
     public Article createArticleByAuthor(ArticleDto articleDto, String username) {
         User user = userService.getUserByUsername(username);
         if (!(user instanceof Author author)) {
@@ -116,29 +116,31 @@ public class ArticleService {
         articleStats.setTimeToRead(articleStatsService.calculateTimeToRead(article.getTitle(), article.getContent()));
         articleStats.setArticle(article);
         articleStatsRepository.save(articleStats);
-        notificationService.createNotification(author, "New article created", NotificationType.ARTICLE);
+        notificationService.createNotification(author, "New article created: " + article.getTitle(), NotificationType.ARTICLE);
         notificationService.createNotificationForSubscribers(article);
         return article;
     }
 
     @Transactional
-    @PreAuthorize("hasAnyRole('AUTHOR','ADMIN')")
+    @PreAuthorize("hasAnyRole('AUTHOR','ADMIN') and hasAuthority('ARTICLE_UPDATE')")
     public Article updateArticle(UUID id, ArticleDto articleDto, String username) {
         Article article = validateAndProcessArticle(id, username);
         ArticleStats articleStats = articleStatsService.getArticleStatsByArticleId(id);
         articleStats.setTimeToRead(articleStatsService.calculateTimeToRead(articleDto.getTitle(), articleDto.getContent()));
         article.setTitleUrl(articleUtilsService.generateUrlFromTitleAndId(articleDto.getTitle(), id));
+        notificationService.createNotification(article.getAuthor(), "Article updated: " + article.getTitle(), NotificationType.ARTICLE);
         return articleMapper.mapToArticle(article, articleDto);
     }
 
     @Transactional
-    @PreAuthorize("hasAnyRole('AUTHOR','ADMIN')")
+    @PreAuthorize("hasAnyRole('AUTHOR','ADMIN') and hasAuthority('ARTICLE_DELETE')")
     public void deleteArticle(UUID id, String username) {
         Article article = validateAndProcessArticle(id, username);
         ArticleStats articleStats = articleStatsService.getArticleStatsByArticleId(id);
         articleStatsRepository.delete(articleStats);
         article.removeTags();
         articleRepository.delete(article);
+        notificationService.createNotification(article.getAuthor(), "Article deleted: " + article.getTitle(), NotificationType.ARTICLE);
     }
 
     private Article validateAndProcessArticle(UUID articleId, String username) {

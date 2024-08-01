@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{blog/template :: head(title = 'Blog')}">
+
+<body>
+
+<th:block th:replace="~{blog/template :: header(categories = ${categories})}"/>
+<main class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <h3 th:text="${authorName}" class="pb-2 mb-4 fst-italic border-bottom">
+               Author
+            </h3>
+            <div th:replace="~{blog/template :: articles-display(articles = ${summaryArticlesPage})}"></div>
+
+            <div th:replace="~{blog/template :: pagination-articles(href='/authors/' + ${authorId} + '/articles',
+                        currentPage=${currentPageNumber},
+                        totalPages=${totalPagesNumber},
+                        search=null,
+                        size=${size})}"></div>
+
+        </div>
+
+        <div class="col-md-4">
+            <form th:replace="~{blog/template :: search-form(search = ${search})}"></form>
+            <div class="position-sticky" style="top: 2rem;">
+
+                <div th:replace="~{blog/template :: popular-articles(tagstop3articles = ${tagstop3articles})}"></div>
+
+                <div th:replace="~{blog/template :: popular-tags(tags = ${tags})}"></div>
+                <div class="row">
+                    <div th:replace="~{blog/template :: archive-articles(monthYearList = ${monthYearList})}"></div>
+                </div>
+
+                <div th:replace="~{blog/template :: elsewhere}">
+            </div>
+        </div>
+    </div>
+
+</main>
+
+<th:block th:replace="~{blog/template :: footer}"/>
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+</body>
+</html>
+
