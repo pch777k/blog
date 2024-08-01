@@ -17,13 +17,6 @@
                         search=null,
                         size=${size})}">
                 </div>
-
-<!--                <div th:replace="~{blog/template :: pageNumber(href='/',-->
-<!--                        currentPage=${currentPageNumber},-->
-<!--                        totalPages=${totalPagesNumber})}">-->
-<!--                </div>-->
-
-<!--                <div th:replace="~{blog/template :: pageSize(href='/', size=${size})}"></div>-->
             </div>
 
         </div>
@@ -36,14 +29,7 @@
                 <div class="row">
                     <div th:replace="~{blog/template :: archive-articles(monthYearList = ${monthYearList})}"></div>
                 </div>
-                <div class="p-4">
-                    <h4 class="fst-italic">Elsewhere</h4>
-                    <ol class="list-unstyled">
-                        <li><a href="#">GitHub</a></li>
-                        <li><a href="#">Twitter</a></li>
-                        <li><a href="#">Facebook</a></li>
-                    </ol>
-                </div>
+                <div th:replace="~{blog/template :: elsewhere}">
             </div>
         </div>
     </div>

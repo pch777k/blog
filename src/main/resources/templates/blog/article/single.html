@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head th:replace="~{blog/template :: head(title = 'Blog')}">
+
+<body>
+
+<th:block th:replace="~{blog/template :: header(categories = ${categories})}"/>
+<main class="container">
+    <div class="row">
+        <div class="col-md-8">
+            <div th:if="${message != null}" class="alert alert-success" role="alert">
+                <i class="bi bi-check-circle"> </i><span th:text="${message.content}">Article created/edited successfully!</span>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="card shadow-sm mb-4">
+                        <img th:src="@{${article.imageUrl}}" class="card-img-top" height="400" alt="...">
+                        <div class="card-body">
+                            <a th:href="@{'/categories/'+ ${#strings.toLowerCase(article.category.name)} + '/articles'}">
+                                <strong th:text="${article.category.name}"
+                                        class="d-inline-block mb-2 text-success-emphasis">Category</strong>
+                            </a>
+                            <h3 th:text="${article.title}" class="mb-0">Post title</h3>
+                            <small> <span class="mb-1 text-body-secondary"
+                                          th:text="${#temporals.format(article.created, 'MMM dd, yyyy', T(java.util.Locale).ENGLISH)} + ' · ' + ${articleStats.timeToRead} + ' min read'">created · time to read</span>
+                            </small>
+                            <p th:utext="${article.content}" class="card-text">Article content</p>
+                            <div th:unless="${article.tags.isEmpty()}" class="pt-3 mb-2">
+                                tags: <span th:each="tag, it : ${article.tags}">
+                                         #<a th:href="@{'/tags/'+ ${tag.name} + '/articles'}" th:text="${tag.name}"></a>
+                                        <span th:if="${!it.last}">, </span>
+                                        </span>
+                            </div>
+                            <th:block th:if="${userArticleLikeService.canEditOrDeleteArticle(userId, article.id)}">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div class="btn-group">
+                                        <a th:href="@{'/author/articles/'+ ${article.id} +'/edit'}"
+                                           sec:authorize="hasAuthority('ARTICLE_UPDATE')"
+                                           class="btn btn-sm btn-outline-secondary">
+                                            Edit
+                                        </a>
+                                        <a th:href="@{'/author/articles/'+ ${article.id} +'/delete'}"
+                                           sec:authorize="hasAuthority('ARTICLE_DELETE')"
+                                           onclick="return confirm('Are you sure delete this article?');"
+                                           class="btn btn-sm btn-outline-secondary">
+                                            Delete
+                                        </a>
+
+                                    </div>
+                                </div>
+                            </th:block>
+                        </div>
+                        <div class="card-footer text-center">
+                            <div class="row align-items-start">
+                                <div class="col">
+                                    <a th:if="${userArticleLikeService.canLikeArticle(userId, article.id)}"
+                                       role="button"
+                                       class="likeButton" th:attr="data-article-id=${article.id}">
+                                        <small class="text-body-secondary">
+                                            <i class="bi bi-hand-thumbs-up-fill"></i>
+                                            <span th:id="'likesCount-' + ${article.id}"
+                                                  th:text="${articleStats.likes}">0</span>
+                                        </small>
+                                    </a>
+
+                                    <small th:unless="${userArticleLikeService.canLikeArticle(userId, article.id)}"
+                                           class="text-body-secondary">
+                                        <i class="bi bi-hand-thumbs-up-fill"></i>
+                                        <span th:id="'likesCount-' + ${article.id}"
+                                              th:text="${articleStats.likes}">0</span>
+                                    </small>
+                                </div>
+                                <div class="col">
+                                    <small class="text-body-secondary">
+                                        <i class="bi bi-chat-fill"></i>
+                                        <span id="commentCount" th:text="${article.comments.size()}">0</span>
+                                    </small>
+                                </div>
+                                <div class="col">
+                                    <small>
+                                        <i class="bi bi-eye-fill"></i>
+                                        <span th:text="${articleStats.views}" class="text-body-secondary">0</span>
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row m-0">
+                <nav class="blog-pagination" aria-label="Pagination">
+                    <a th:if="${articleNavigation.prev != null}" class="btn btn-outline-secondary"
+                       th:href="@{'/articles/'+ ${articleNavigation.prev}}">prev</a>
+                    <a th:if="${articleNavigation.prev == null}" class="btn btn-outline-secondary disabled"
+                       th:href="@{'/articles/'+ ${articleNavigation.prev}}">prev</a>
+                    <a th:if="${articleNavigation.next != null}" class="btn btn-outline-secondary"
+                       th:href="@{'/articles/'+ ${articleNavigation.next}}">next</a>
+                    <a th:if="${articleNavigation.next == null}" class="btn btn-outline-secondary disabled"
+                       th:href="@{'/articles/'+ ${articleNavigation.next}}">next</a>
+                </nav>
+            </div>
+
+            <h3 class="fst-italic">
+                Recent comments
+            </h3>
+            <div class="row d-flex justify-content-center my-3">
+                <div class="col-md-12">
+                    <div class="card text-body">
+                        <div th:each="comment, iter : ${commentsPage.content}">
+                            <div th:id="'comment-' + ${comment.id}" class="card-body p-4">
+                                <div class="d-flex flex-start">
+                                    <img class="rounded-circle shadow-1-strong me-3"
+                                         th:src="${comment.user.avatarUrl}" alt="avatar" width="60"
+                                         height="60"/>
+                                    <div>
+                                        <h6 th:text="${comment.user.firstName + ' ' + comment.user.lastName}"
+                                            class="fw-bold mb-1">
+                                        </h6>
+                                        <div class="d-flex align-items-center mb-3">
+                                            <p th:text="${#temporals.format(comment.created, 'MMM dd, yyyy', T(java.util.Locale).ENGLISH)}"
+                                               class="mb-0">
+                                                March 07, 2021</p>
+                                            <th:block th:if="${#authorization.expression('isAuthenticated()')}">
+                                                <a th:if="${canReceiveMessageMap.containsKey(comment.user.id)
+                                                            and canReceiveMessageMap.get(comment.user.id)
+                                                            and canSendMessages
+                                                            and !(comment.user.id == userId)}"
+
+                                                   th:href="@{/user/messages/{userId}(userId=${comment.user.id})}"
+                                                   class="link-muted">
+                                                    <i class="fa fa-envelope text-secondary ms-2"></i>
+                                                </a>
+                                                <a th:if="${commentService.canEditOrDeleteComment(userId, comment.id)}"
+                                                   sec:authorize="hasAuthority('COMMENT_UPDATE')"
+                                                   th:href="@{'/articles/' + ${titleUrl} + '/comments/' + ${comment.id} + '/edit'}"
+                                                   class="link-muted"><i class="fa fa-pencil text-primary ms-2"></i></a>
+                                                <a th:if="${commentService.canEditOrDeleteComment(userId, comment.id)}"
+                                                   sec:authorize="hasAuthority('COMMENT_DELETE')"
+                                                   th:href="@{'/articles/'+ ${titleUrl} + '/comments/' + ${comment.id} + '/delete'}"
+                                                   onclick="return confirm('Are you sure delete this comment?');"
+                                                   class="link-muted"><i class="fa fa-trash text-danger ms-2"></i></a>
+                                            </th:block>
+                                        </div>
+                                        <p th:text="${comment.content}" class="mb-0">Comment content
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr class="my-0" th:unless="${iter.last}"/>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div th:replace="~{blog/template :: pagination-comments(href='/articles/' + ${article.titleUrl},
+                        currentPage=${commentsPage.getNumber()},
+                        totalPages=${commentsPage.getTotalPages()})}">
+            </div>
+            <div sec:authorize="hasAuthority('COMMENT_CREATE')" id="commentContainer" class="mb-3">
+                <form id="commentForm" th:object="${commentDto}" method="post"
+                      th:action="@{${commentId} == null ? '/articles/' + ${article.titleUrl} + '/comments/add' : '/articles/' + ${article.titleUrl} + '/comments/' + ${commentId} + '/edit'}">
+                    <div class="mb-3">
+                        <label for="content" class="form-label">Comment form</label>
+                        <textarea th:field="*{content}" id="content" name="content" class="form-control"
+                                  rows="6"></textarea>
+                        <small><span class="text text-danger" th:if="${#fields.hasErrors('content')}"
+                                     th:errors="*{content}"></span></small>
+                    </div>
+                    <button type="submit" id="submitBtn" class="btn btn-outline-secondary"
+                            th:text="${commentId} == null ? 'Add comment' : 'Update comment'"></button>
+                </form>
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+            <div class="position-sticky" style="top: 2rem;">
+                <div class="p-2 mb-3 bg-body-tertiary rounded text-center">
+
+                    <img th:src="${article.author.avatarUrl}" class="bd-placeholder-img rounded-circle m-3"
+                         width="140" height="140" alt="avatar">
+                    <h4 th:text="${article.author.fullName}" class="fw-normal">Julia Williams</h4>
+                    <p th:text="${article.author.bio}">bio</p>
+                    <p><a class="btn btn-outline-secondary"
+                          th:href="@{'/authors/' + ${article.author.id} + '/articles'}">View articles &raquo;</a></p>
+                    <p>
+                        <a id="subscribeButton" class="btn btn-outline-secondary subscribeButton"
+                           sec:authorize="hasRole('READER') and hasAuthority('USER_SUBSCRIBE')"
+                           th:attr="data-article-author-id=${article.author.id}">
+                            Subscribe
+                        </a>
+
+                        <a id="unsubscribeButton" class="btn btn-outline-secondary unsubscribeButton"
+                           style="display: none;"
+                           sec:authorize="hasAuthority('USER_SUBSCRIBE')"
+                           th:attr="data-article-author-id=${article.author.id}">
+                            Unsubscribe
+                        </a>
+                    </p>
+                </div>
+
+                <div th:replace="~{blog/template :: popular-articles(tagstop3articles = ${tagstop3articles})}"></div>
+
+                <div th:replace="~{blog/template :: popular-tags(tags = ${tags})}"></div>
+                <div class="row">
+                    <div th:replace="~{blog/template :: archive-articles(monthYearList = ${monthYearList})}"></div>
+                </div>
+
+                <div th:replace="~{blog/template :: elsewhere}">
+                </div>
+            </div>
+        </div>
+    </div>
+
+</main>
+<!-- Delete Comment Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header justify-content-center bg-light text-primary">
+                <strong>Delete</strong>
+            </div>
+            <div class="modal-body text-center">
+                Are you sure, you want to delete this Comment?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">Cancel</button>
+                <a href="" class="btn btn-danger btn-sm" id="deleteRef">Delete</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Delete Comment Modal -->
+
+
+<th:block th:replace="~{blog/template :: footer}"/>
+
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    $(document).ready(function () {
+        let authorId = /*[[${article.author.id}]]*/ null;
+
+        function handleSubscription(authorId) {
+            $.get("/api/v1/users/current-user")
+                .done(function (userDetails) {
+                    if (!userDetails || !userDetails.authorities) {
+                        console.warn("User details or authorities are undefined.");
+                        $("#subscribeButton").hide();
+                        $("#unsubscribeButton").hide();
+                        return;
+                    }
+
+                    let roles = userDetails.authorities.map(function (authority) {
+                        return authority.authority;
+                    });
+
+                    let isReader = roles.includes('ROLE_READER');
+
+                    if (!isReader) {
+                        $("#subscribeButton").hide();
+                        $("#unsubscribeButton").hide();
+                    } else {
+                        $.get("/api/v1/subscriptions/authors/" + authorId + "/check")
+                            .done(function (response) {
+                                let hasSubscription = response.hasSubscription;
+                                if (hasSubscription) {
+                                    $("#subscribeButton").hide();
+                                    $("#unsubscribeButton").show();
+                                } else {
+                                    $("#subscribeButton").show();
+                                    $("#unsubscribeButton").hide();
+                                }
+                            })
+                            .fail(function (xhr, status, error) {
+                                console.error("Error while checking subscription:", error);
+                                $("#subscriptionStatus").text("Error");
+                            });
+                    }
+                })
+                .fail(function (xhr, status, error) {
+                    console.error("Error while getting current user:", error);
+                });
+        }
+
+        handleSubscription(authorId);
+
+        $("#subscribeButton").click(function () {
+            $.post("/api/v1/subscriptions/authors/" + authorId)
+                .done(function () {
+                    console.log("Subscription added successfully!");
+                    handleSubscription(authorId);
+                })
+                .fail(function (xhr, status, error) {
+                    console.error("Error while adding subscription:", error);
+                });
+        });
+
+        $("#unsubscribeButton").click(function () {
+            $.ajax({
+                type: "DELETE",
+                url: "/api/v1/subscriptions/authors/" + authorId,
+                success: function () {
+                    console.log("Subscription removed successfully!");
+                    handleSubscription(authorId);
+                },
+                error: function (xhr, status, error) {
+                    console.error("Error while removing subscription:", error);
+                }
+            });
+        });
+    });
+    /*]]>*/
+</script>
+
+
+<script
+        type="text/javascript"
+        src="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/7.2.0/mdb.umd.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+
+
+</body>
+</html>
+

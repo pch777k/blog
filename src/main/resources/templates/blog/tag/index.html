@@ -8,34 +8,31 @@
 <main class="container">
     <div class="row">
         <div class="col-md-8">
+            <h3 class="pb-2 mb-4 fst-italic border-bottom">
+                <a th:href="@{'/tags/'+ ${tagName}}">
+                    # <span th:text="${tagName}">tag name</span>
+                </a>
+            </h3>
             <div th:replace="~{blog/template :: articles-display(articles = ${summaryArticlesPage})}"></div>
 
-            <div class="row">
-                <div th:replace="~{blog/template :: pagination-articles(href='/',
-                        currentPage=${currentPageNumber},
-                        totalPages=${totalPagesNumber},
-                        search=null,
-                        size=${size})}">
-                </div>
-
-                <div th:replace="~{blog/template :: pageNumber(href='/',
-                        currentPage=${currentPageNumber},
-                        totalPages=${totalPagesNumber})}">
-                </div>
-
-                <div th:replace="~{blog/template :: pageSize(href='/', size=${size})}"></div>
-            </div>
-
+            <th:block th:replace="~{blog/template :: pagination-articles(href='/tags/' + ${tagName} + '/articles',
+                    currentPage=${currentPageNumber},
+                    totalPages=${totalPagesNumber},
+                    search=null,
+                    size=${size})}">
+            </th:block>
         </div>
 
         <div class="col-md-4">
             <form th:replace="~{blog/template :: search-form(search = ${search})}"></form>
             <div class="position-sticky" style="top: 2rem;">
+
                 <div th:replace="~{blog/template :: popular-articles(tagstop3articles = ${tagstop3articles})}"></div>
-                <div th:replace="~{blog/template :: popular-tags(tags = ${tags})}"></div>
                 <div class="row">
-                    <div th:replace="~{blog/template :: archive-articles(monthYearList = ${monthYearList})}"></div>
+                    <div th:replace="~{blog/template :: popular-tags(tags = ${tags})}"></div>
                 </div>
+                <div th:replace="~{blog/template :: archive-articles(monthYearList = ${monthYearList})}"></div>
+
                 <div th:replace="~{blog/template :: elsewhere}">
             </div>
         </div>

@@ -9,6 +9,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="/js/article-like-button.js"></script>
 
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -120,18 +121,33 @@
     <header class="border-bottom lh-1 py-3">
         <div class="row flex-nowrap justify-content-between align-items-center">
             <div class="col-4 pt-1">
-                <a class="link-secondary" href="#">Subscribe</a>
             </div>
             <div class="col-4 text-center">
                 <a class="blog-header-logo text-body-emphasis text-decoration-none" href="/">Blog</a>
+
+
             </div>
-            <div class="col-2 text-center">
-                <a th:href="@{'/articles'}" class="btn btn-sm btn-outline-secondary">Add</a>
-            </div>
-            <div class="col-2 d-flex justify-content-end align-items-center">
-                <a th:unless="${#authorization.expression('isAuthenticated()')}" class="btn btn-sm btn-outline-secondary" href="/login">Sign in</a>
-                <a th:if="${#authorization.expression('isAuthenticated()')}" class="btn btn-sm btn-outline-secondary" href="/logout">Log out</a>
-                <a th:unless="${#authorization.expression('isAuthenticated()')}" class="btn btn-sm btn-outline-secondary" href="#">Sign up</a>
+
+            <div class="col-4 d-flex justify-content-end align-items-center">
+                <a th:unless="${#authorization.expression('isAuthenticated()')}"
+                   class="btn btn-sm btn-outline-secondary" href="/login">Sign in</a>
+                <a th:unless="${#authorization.expression('isAuthenticated()')}"
+                   class="btn btn-sm btn-outline-secondary" href="/signup">Sign up</a>
+                <div th:if="${#authorization.expression('isAuthenticated()')}" class="dropdown text-end">
+                    <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle"
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                        <img th:src="@{${avatarUrl}}" alt="avatar" width="32" height="32" class="rounded-circle">
+                    </a>
+                    <ul class="dropdown-menu text-small">
+                        <li th:if="${#authorization.expression('hasRole(''ADMIN'') or hasRole(''AUTHOR'')')}">
+                            <a class="dropdown-item" th:href="@{'/author/articles/add'}">New article</a></li>
+                        <li><a class="dropdown-item" href="/user/profile">Profile</a></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li><a class="dropdown-item" href="/logout">Sign out</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
     </header>
@@ -169,37 +185,49 @@
                 <div th:each="article : ${articles}" class="col-md-6 d-flex align-items-stretch">
                     <div class="card shadow-sm mb-4" style="width:30rem;">
                         <a th:href="@{'/articles/'+ ${article.titleUrl}}">
-                        <img th:src="@{${article.imageUrl}}" class="card-img-top " height="200" alt="...">
+                            <img th:src="@{${article.imageUrl}}" class="card-img-top " height="200" alt="...">
                         </a>
                         <div class="card-body">
                             <a th:href="@{'/categories/'+ ${#strings.toLowerCase(article.categoryName)} + '/articles'}">
-                                <strong th:text="${article.categoryName}" class="d-inline-block mb-2 text-success-emphasis">Category</strong>
+                                <strong th:text="${article.categoryName}"
+                                        class="d-inline-block mb-2 text-success-emphasis">Category</strong>
                             </a>
                             <a th:href="@{'/articles/'+ ${article.titleUrl}}">
-                            <h5 th:text="${article.title}" class="mb-0">Post title</h5>
+                                <h5 th:text="${article.title}" class="mb-0">Post title</h5>
                             </a>
                             <small>
                             <span class=" text-body-secondary"
-                                  th:text="${#temporals.format(article.created, 'MMM dd, yyyy')} + ' · ' + ${article.timeToRead} + ' min read'">created · time to read</span>
+                                  th:text="${#temporals.format(article.created, 'MMM dd, yyyy', T(java.util.Locale).ENGLISH)} + ' · ' + ${article.timeToRead} + ' min read'">created · time to read</span>
                             </small>
-                                <p th:text="${article.shortContent}" class="card-text">Article content</p>
+                            <p th:utext="${article.shortContent}" class="card-text">Article content</p>
                         </div>
                         <div class="card-footer text-center">
                             <div class="row align-items-start">
                                 <div class="col">
-                                    <a role="button" class="likeButton" th:attr="data-article-id=${article.id}">
+                                    <a th:if="${userArticleLikeService.canLikeArticle(userId, article.id)}"
+                                       role="button"
+
+                                       class="likeButton" th:attr="data-article-id=${article.id}">
                                         <small class="text-body-secondary">
                                             <i class="bi bi-hand-thumbs-up-fill"></i>
-                                            <span th:id="'likesCount-' + ${article.id}" th:text="${article.likes}">0</span>
+                                            <span th:id="'likesCount-' + ${article.id}"
+                                                  th:text="${article.likes}">0</span>
                                         </small>
                                     </a>
+
+                                    <small th:unless="${userArticleLikeService.canLikeArticle(userId, article.id)}"
+                                           class="text-body-secondary">
+                                        <i class="bi bi-hand-thumbs-up-fill"></i>
+                                        <span th:id="'likesCount-' + ${article.id}" th:text="${article.likes}">0</span>
+                                    </small>
+
                                 </div>
                                 <div class="col">
                                     <a th:href="@{'/articles/'+ ${article.titleUrl} + '#commentsContainer'}">
-                                    <small class="text-body-secondary">
-                                        <i class="bi bi-chat-fill"></i>
-                                        <span th:text="${article.totalComments}">0</span>
-                                    </small>
+                                        <small class="text-body-secondary">
+                                            <i class="bi bi-chat-fill"></i>
+                                            <span th:text="${article.totalComments}">0</span>
+                                        </small>
                                     </a>
                                 </div>
                                 <div class="col">
@@ -215,7 +243,6 @@
 
                 </div>
             </div>
-
 
 
             <div class="row">
@@ -251,55 +278,7 @@
                             <strong class="d-inline-block mb-2 text-success-emphasis">Design</strong>
                             <h3 class="mb-0">Post title</h3>
                             <div class="mb-1 text-body-secondary">Nov 11</div>
-                            <p class="card-text">This is a wider card with supporting text below as a natural lead-in to
-                                additional content. This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.This is a wider card with supporting text below as a natural lead-in to
-                                additional content.</p>
+                            <p class="card-text"></p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <div class="btn-group">
                                     <button type="button" class="btn btn-sm btn-outline-secondary">View</button>
@@ -321,10 +300,12 @@
         </div>
 
         <div class="col-md-4">
-            <form th:fragment="search-form(search)" class="col-12 col-lg-auto mb-3" role="search" th:action="@{'/search'}">
+            <form th:fragment="search-form(search)" class="col-12 col-lg-auto mb-3" role="search"
+                  th:action="@{'/search'}">
                 <div class="input-group">
-                    <input type="hidden" name="size" th:value="${size}" />
-                    <input name="s" th:value="${search}" type="search" class="form-control" placeholder="Search..." aria-label="Search" required>
+                    <input type="hidden" name="size" th:value="${size}"/>
+                    <input name="s" th:value="${search}" type="search" class="form-control" placeholder="Search..."
+                           aria-label="Search" required>
                     <button type="submit" class="btn btn-secondary">Search</button>
                 </div>
             </form>
@@ -347,7 +328,8 @@
                                     <div class="card-body">
                                         <h6 th:text="${shortArticle.title}" class="card-title">Card title</h6>
                                         <p class="card-text"><small
-                                                th:text="${#temporals.format(shortArticle.created, 'MMMM dd, yyyy')}"
+                                                th:text="${#temporals.format(shortArticle.created,
+                                                'MMMM dd, yyyy', T(java.util.Locale).ENGLISH)}"
                                                 class="text-muted">created</small></p>
                                     </div>
                                 </div>
@@ -361,7 +343,8 @@
                     <h4 class="fst-italic">Popular tags</h4>
                     <div class="row">
                         <ul class="tags">
-                            <li><a th:each="tag : ${tags}" th:href="@{'/tags/'+ ${tag.name} + '/articles'}" th:text="${'#' + tag.name}"
+                            <li><a th:each="tag : ${tags}" th:href="@{'/tags/'+ ${tag.name} + '/articles'}"
+                                   th:text="${'#' + tag.name}"
                                    style="margin: 0 4px 4px 0;">Travel</a></li>
                         </ul>
                     </div>
@@ -380,41 +363,51 @@
                         </div>
                     </div>
                 </div>
-                <div class="p-4">
-                    <h4 class="fst-italic">Elsewhere</h4>
-                    <ol class="list-unstyled">
-                        <li><a href="#">GitHub</a></li>
-                        <li><a href="#">Twitter</a></li>
-                        <li><a href="#">Facebook</a></li>
-                    </ol>
+                <div th:fragment="elsewhere">
+                    <div class="pb-4">
+                        <h4 class="fst-italic">Elsewhere</h4>
+                        <ol class="list-unstyled">
+                            <li><a href="#">GitHub</a></li>
+                            <li><a href="#">Twitter</a></li>
+                            <li><a href="#">Facebook</a></li>
+                        </ol>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
 </main>
-
-<div th:fragment="pagination-articles(href, currentPage, totalPages, search, size)">
+<div th:fragment="pagination-sort-search(href, currentPage, totalPages, search, field, size, direction)">
     <!-- Pagination articles -->
     <nav th:if="${totalPages > 1}" aria-label="Page navigation">
         <ul class="pagination pagination-sm">
             <li th:class="'page-item' + ${currentPage == 0 ? ' disabled' : ''}">
-                <a th:if="${search != null}" class="page-link" th:href="@{${href} (page=${currentPage - 1}, s=${search})}">&lsaquo;</a>
-                <a th:if="${search == null}" class="page-link" th:href="@{${href} (page=${currentPage - 1}, size=${size})}">&lsaquo;</a>
+                <a th:if="${search != null}" class="page-link"
+                   th:href="@{${href} (page=${currentPage - 1}, s=${search})}">&lsaquo;</a>
+                <a th:if="${search == null}" class="page-link"
+                   th:href="@{${href} (page=${currentPage - 1}, size=${size}, field=${field}, direction=${direction})}">&lsaquo;</a>
             </li>
             <li th:if="${currentPage >= 2}" class="page-item">
-                <a th:if="${search != null}" class="page-link" th:href="@{${href} (page=${0}, s=${search}, size=${size})}">1</a>
-                <a th:if="${search == null}" class="page-link" th:href="@{${href} (page=${0}, size=${size})}">1</a>
+                <a th:if="${search != null}" class="page-link"
+                   th:href="@{${href} (page=${0}, size=${size}, field=${field}, direction=${direction}, s=${search})}">1</a>
+                <a th:if="${search == null}" class="page-link"
+                   th:href="@{${href} (page=${0}, size=${size}, field=${field}, direction=${direction})}">1</a>
             </li>
             <li th:if="${currentPage > 2}" class="page-item">
                 <span class="page-link">...</span>
             </li>
-            <th:block th:each="i: ${#numbers.sequence(currentPage - 1, currentPage + 1)}" th:if="${i >= 0 && i < totalPages}">
+            <th:block th:each="i: ${#numbers.sequence(currentPage - 1, currentPage + 1)}"
+                      th:if="${i >= 0 && i < totalPages}">
                 <li class="page-item" th:class="${currentPage == i} ? 'active'">
                     <a class="page-link"
-                       th:if="${currentPage != i && search != null}" th:href="@{${href} (page=${i}, s=${search}, size=${size})}" th:text="${i + 1}"></a>
+                       th:if="${currentPage != i && search != null}"
+                       th:href="@{${href} (page=${i}, size=${size}, field=${field}, direction=${direction}, s=${search})}"
+                       th:text="${i + 1}"></a>
                     <a class="page-link"
-                       th:if="${currentPage != i && search == null}" th:href="@{${href} (page=${i}, size=${size})}" th:text="${i + 1}"></a>
+                       th:if="${currentPage != i && search == null}"
+                       th:href="@{${href} (page=${i}, size=${size}, field=${field}, direction=${direction})}"
+                       th:text="${i + 1}"></a>
                     <a class="page-link" th:if="${currentPage == i}" th:text="${i + 1}" disabled></a>
                 </li>
             </th:block>
@@ -422,12 +415,122 @@
                 <span class="page-link">...</span>
             </li>
             <li th:if="${currentPage <= totalPages - 3}" class="page-item">
-                <a th:if="${search != null}" class="page-link" th:href="@{${href} (page=${totalPages - 1}, s=${search}, size=${size})}" th:text="${totalPages}"></a>
-                <a th:if="${search == null}" class="page-link" th:href="@{${href} (page=${totalPages - 1}, size=${size})}" th:text="${totalPages}"></a>
+                <a th:if="${search != null}" class="page-link"
+                   th:href="@{${href} (page=${totalPages - 1}, size=${size}, field=${field}, direction=${direction}, s=${search})}"
+                   th:text="${totalPages}"></a>
+                <a th:if="${search == null}" class="page-link"
+                   th:href="@{${href} (page=${totalPages - 1}, size=${size}, field=${field}, direction=${direction})}"
+                   th:text="${totalPages}"></a>
             </li>
             <li th:class="'page-item' + ${currentPage == totalPages - 1 ? ' disabled' : ''}">
-                <a th:if="${search != null}" class="page-link" th:href="@{${href} (page=${currentPage + 1}, s=${search}, size=${size})}">&rsaquo;</a>
-                <a th:if="${search == null}" class="page-link" th:href="@{${href} (page=${currentPage + 1}, size=${size})}">&rsaquo;</a>
+                <a th:if="${search != null}" class="page-link"
+                   th:href="@{${href} (page=${currentPage + 1}, size=${size}, field=${field}, direction=${direction}, s=${search})}">&rsaquo;</a>
+                <a th:if="${search == null}" class="page-link"
+                   th:href="@{${href} (page=${currentPage + 1}, size=${size}, field=${field}, direction=${direction})}">&rsaquo;</a>
+            </li>
+        </ul>
+    </nav>
+    <!-- Pagination articles -->
+</div>
+<div th:fragment="pagination-author-articles(href, currentPage, totalPages, search, field, size, direction)">
+    <!-- Pagination articles -->
+    <nav th:if="${totalPages > 1}" aria-label="Page navigation">
+        <ul class="pagination pagination-sm">
+            <li th:class="'page-item' + ${currentPage == 0 ? ' disabled' : ''}">
+                <a th:if="${search != null}" class="page-link"
+                   th:href="@{${href} (page=${currentPage - 1}, s=${search})}">&lsaquo;</a>
+                <a th:if="${search == null}" class="page-link"
+                   th:href="@{${href} (page=${currentPage - 1}, size=${size}, field=${field}, direction=${direction})}">&lsaquo;</a>
+            </li>
+            <li th:if="${currentPage >= 2}" class="page-item">
+                <a th:if="${search != null}" class="page-link"
+                   th:href="@{${href} (page=${0}, size=${size}, field=${field}, direction=${direction}, s=${search})}">1</a>
+                <a th:if="${search == null}" class="page-link"
+                   th:href="@{${href} (page=${0}, size=${size}, field=${field}, direction=${direction})}">1</a>
+            </li>
+            <li th:if="${currentPage > 2}" class="page-item">
+                <span class="page-link">...</span>
+            </li>
+            <th:block th:each="i: ${#numbers.sequence(currentPage - 1, currentPage + 1)}"
+                      th:if="${i >= 0 && i < totalPages}">
+                <li class="page-item" th:class="${currentPage == i} ? 'active'">
+                    <a class="page-link"
+                       th:if="${currentPage != i && search != null}"
+                       th:href="@{${href} (page=${i}, size=${size}, field=${field}, direction=${direction}, s=${search})}"
+                       th:text="${i + 1}"></a>
+                    <a class="page-link"
+                       th:if="${currentPage != i && search == null}"
+                       th:href="@{${href} (page=${i}, size=${size}, field=${field}, direction=${direction})}"
+                       th:text="${i + 1}"></a>
+                    <a class="page-link" th:if="${currentPage == i}" th:text="${i + 1}" disabled></a>
+                </li>
+            </th:block>
+            <li th:if="${currentPage < totalPages - 3}" class="page-item">
+                <span class="page-link">...</span>
+            </li>
+            <li th:if="${currentPage <= totalPages - 3}" class="page-item">
+                <a th:if="${search != null}" class="page-link"
+                   th:href="@{${href} (page=${totalPages - 1}, size=${size}, field=${field}, direction=${direction}, s=${search})}"
+                   th:text="${totalPages}"></a>
+                <a th:if="${search == null}" class="page-link"
+                   th:href="@{${href} (page=${totalPages - 1}, size=${size}, field=${field}, direction=${direction})}"
+                   th:text="${totalPages}"></a>
+            </li>
+            <li th:class="'page-item' + ${currentPage == totalPages - 1 ? ' disabled' : ''}">
+                <a th:if="${search != null}" class="page-link"
+                   th:href="@{${href} (page=${currentPage + 1}, size=${size}, field=${field}, direction=${direction}, s=${search})}">&rsaquo;</a>
+                <a th:if="${search == null}" class="page-link"
+                   th:href="@{${href} (page=${currentPage + 1}, size=${size}, field=${field}, direction=${direction})}">&rsaquo;</a>
+            </li>
+        </ul>
+    </nav>
+    <!-- Pagination articles -->
+</div>
+
+<div th:fragment="pagination-articles(href, currentPage, totalPages, search, size)">
+    <!-- Pagination articles -->
+    <nav th:if="${totalPages > 1}" aria-label="Page navigation">
+        <ul class="pagination pagination-sm">
+            <li th:class="'page-item' + ${currentPage == 0 ? ' disabled' : ''}">
+                <a th:if="${search != null}" class="page-link"
+                   th:href="@{${href} (page=${currentPage - 1}, s=${search})}">&lsaquo;</a>
+                <a th:if="${search == null}" class="page-link"
+                   th:href="@{${href} (page=${currentPage - 1}, size=${size})}">&lsaquo;</a>
+            </li>
+            <li th:if="${currentPage >= 2}" class="page-item">
+                <a th:if="${search != null}" class="page-link"
+                   th:href="@{${href} (page=${0}, s=${search}, size=${size})}">1</a>
+                <a th:if="${search == null}" class="page-link" th:href="@{${href} (page=${0}, size=${size})}">1</a>
+            </li>
+            <li th:if="${currentPage > 2}" class="page-item">
+                <span class="page-link">...</span>
+            </li>
+            <th:block th:each="i: ${#numbers.sequence(currentPage - 1, currentPage + 1)}"
+                      th:if="${i >= 0 && i < totalPages}">
+                <li class="page-item" th:class="${currentPage == i} ? 'active'">
+                    <a class="page-link"
+                       th:if="${currentPage != i && search != null}"
+                       th:href="@{${href} (page=${i}, s=${search}, size=${size})}" th:text="${i + 1}"></a>
+                    <a class="page-link"
+                       th:if="${currentPage != i && search == null}" th:href="@{${href} (page=${i}, size=${size})}"
+                       th:text="${i + 1}"></a>
+                    <a class="page-link" th:if="${currentPage == i}" th:text="${i + 1}" disabled></a>
+                </li>
+            </th:block>
+            <li th:if="${currentPage < totalPages - 3}" class="page-item">
+                <span class="page-link">...</span>
+            </li>
+            <li th:if="${currentPage <= totalPages - 3}" class="page-item">
+                <a th:if="${search != null}" class="page-link"
+                   th:href="@{${href} (page=${totalPages - 1}, s=${search}, size=${size})}" th:text="${totalPages}"></a>
+                <a th:if="${search == null}" class="page-link"
+                   th:href="@{${href} (page=${totalPages - 1}, size=${size})}" th:text="${totalPages}"></a>
+            </li>
+            <li th:class="'page-item' + ${currentPage == totalPages - 1 ? ' disabled' : ''}">
+                <a th:if="${search != null}" class="page-link"
+                   th:href="@{${href} (page=${currentPage + 1}, s=${search}, size=${size})}">&rsaquo;</a>
+                <a th:if="${search == null}" class="page-link"
+                   th:href="@{${href} (page=${currentPage + 1}, size=${size})}">&rsaquo;</a>
             </li>
         </ul>
     </nav>
@@ -447,7 +550,8 @@
             <li th:if="${currentPage > 2}" class="page-item">
                 <span class="page-link">...</span>
             </li>
-            <th:block th:each="i: ${#numbers.sequence(currentPage - 1, currentPage + 1)}" th:if="${i >= 0 && i < totalPages}">
+            <th:block th:each="i: ${#numbers.sequence(currentPage - 1, currentPage + 1)}"
+                      th:if="${i >= 0 && i < totalPages}">
                 <li class="page-item" th:class="${currentPage == i} ? 'active'">
                     <a class="page-link"
                        th:if="${currentPage != i}" th:href="@{${href} (page=${i})}" th:text="${i + 1}"></a>
@@ -489,14 +593,20 @@
     </select>
 </div>
 <footer th:fragment="footer" class="py-5 text-center text-body-secondary bg-body-tertiary">
-    <p>Blog template built for <a href="https://getbootstrap.com/">Bootstrap</a> by <a href="https://twitter.com/mdo">@mdo</a>.
+    <p>Blog template built for <a href="https://getbootstrap.com/">Bootstrap</a> by
+        <a href="https://twitter.com/mdo">@mdo</a>. Modified by
+        <a href="mailto:kozdranski@protonmail.com">
+            <i class="fa fa-envelope"></i> kozdranski
+        </a>.
     </p>
     <p class="mb-0">
         <a href="#">Back to top</a>
     </p>
 </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
 </body>
 </html>
 

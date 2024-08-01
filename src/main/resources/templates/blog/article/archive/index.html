@@ -18,22 +18,12 @@
                         totalPages=${totalPagesNumber},
                         search=null,
                         size=${size})}"></div>
-<!--            <div th:replace="~{blog/template :: pageNumber(href='/articles/' + ${year} + '/' + ${month},-->
-<!--                        currentPage=${currentPageNumber},-->
-<!--                        totalPages=${totalPagesNumber})}"></div>-->
-<!--            <div th:replace="~{blog/template :: pageSize(href='/articles/' + ${year} + '/' + ${month}, size=${size})}"></div>-->
 
         </div>
 
         <div class="col-md-4">
             <form th:replace="~{blog/template :: search-form(search = ${search})}"></form>
             <div class="position-sticky" style="top: 2rem;">
-
-                <div class="p-4 mb-3 bg-body-tertiary rounded">
-                    <h4 class="fst-italic">About</h4>
-                    <p class="mb-0">Customize this section to tell your visitors a little bit about your publication,
-                        writers, content, or something else entirely. Totally up to you.</p>
-                </div>
 
                 <div th:replace="~{blog/template :: popular-articles(tagstop3articles = ${tagstop3articles})}"></div>
 
@@ -42,14 +32,7 @@
                     <div th:replace="~{blog/template :: archive-articles(monthYearList = ${monthYearList})}"></div>
                 </div>
 
-                <div class="p-4">
-                    <h4 class="fst-italic">Elsewhere</h4>
-                    <ol class="list-unstyled">
-                        <li><a href="#">GitHub</a></li>
-                        <li><a href="#">Twitter</a></li>
-                        <li><a href="#">Facebook</a></li>
-                    </ol>
-                </div>
+                <div th:replace="~{blog/template :: elsewhere}">
             </div>
         </div>
     </div>
