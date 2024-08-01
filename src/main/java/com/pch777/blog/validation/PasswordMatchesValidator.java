@@ -1,7 +1,7 @@
 package com.pch777.blog.validation;
 
 import com.pch777.blog.identity.user.dto.ChangePasswordDto;
-import com.pch777.blog.identity.user.dto.RecoverPasswordDto;
+import com.pch777.blog.identity.user.dto.PasswordRecoveryDto;
 import com.pch777.blog.identity.user.dto.UserRegisterDto;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -14,8 +14,8 @@ public class PasswordMatchesValidator implements ConstraintValidator<PasswordMat
             return validatePasswords(userRegisterDto.getPassword(), userRegisterDto.getConfirmPassword(), context);
         } else if (obj instanceof ChangePasswordDto changePasswordDto) {
             return validatePasswords(changePasswordDto.getNewPassword(), changePasswordDto.getConfirmPassword(), context);
-        } else if (obj instanceof RecoverPasswordDto recoverPasswordDto) {
-            return validatePasswords(recoverPasswordDto.getNewPassword(), recoverPasswordDto.getConfirmPassword(), context);
+        } else if (obj instanceof PasswordRecoveryDto passwordRecoveryDto) {
+            return validatePasswords(passwordRecoveryDto.getNewPassword(), passwordRecoveryDto.getConfirmPassword(), context);
         }
         return false;
     }

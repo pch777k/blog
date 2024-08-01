@@ -5,16 +5,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 @RequiredArgsConstructor
+@EnableMethodSecurity
 @Configuration
 public class SecurityConfiguration {
 
@@ -37,29 +37,33 @@ public class SecurityConfiguration {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+
+        String [] whiteList = { "/", "/login", "/signup",
+                "/resend-token", "email/verify", "/password/**",
+                "search", "articles/*", "articles/*/*",
+                "authors/*/articles", "categories/*/articles", "tags/*/articles",
+                "/css/**", "/js/**", "/img/**", "/plugins/**", "/error/**"};
+
         http
                 .authorizeHttpRequests(authz -> authz
-                      //  .requestMatchers("/articles", "/articles/*/edit", "/articles/*/delete").hasAnyRole("ADMIN", "AUTHOR")
-                      //  .requestMatchers("/","/articles/**", "/categories/**", "/tags/**", "/search" ).permitAll()
-                        .requestMatchers("/api/v1/users").permitAll()
-                        .requestMatchers("/api/v1/users/readers").permitAll()
-                        .anyRequest().permitAll()
+                        .requestMatchers(whiteList).permitAll()
+                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/author/**").hasAnyRole("ADMIN", "AUTHOR")
+                        .requestMatchers("/reader/**").hasAnyRole("READER")
+                      //  .requestMatchers("/api/v1/users").permitAll()
+                      //  .requestMatchers("/api/v1/users/readers").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .logout(logout -> logout.logoutSuccessUrl("/"))
                 .csrf(AbstractHttpConfigurer::disable)
 
-                .httpBasic(Customizer.withDefaults())
+             //   .httpBasic(Customizer.withDefaults())
                 .formLogin(form -> form
                        .loginPage("/login")
                         .defaultSuccessUrl("/dashboard")
                         .permitAll());
 
         return http.build();
-    }
-
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer() {
-        return web -> web.ignoring().requestMatchers("/css/**", "/js/**", "/img/**", "/lib/**", "/favicon.ico");
     }
 
     @Bean

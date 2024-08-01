@@ -1,6 +1,6 @@
 package com.pch777.blog.subscription.service;
 
-import com.pch777.blog.exception.UserNotFoundException;
+import com.pch777.blog.exception.resource.UserNotFoundException;
 import com.pch777.blog.notification.domain.model.NotificationType;
 import com.pch777.blog.notification.service.NotificationService;
 import com.pch777.blog.subscription.domain.model.Subscription;
