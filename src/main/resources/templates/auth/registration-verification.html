@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Email verification</title>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="/plugins/fontawesome-free/css/all.min.css">
+    <!-- AdminLTE Theme style -->
+    <link rel="stylesheet" href="/css/adminlte.min.css">
+
+</head>
+<body>
+<div class="container mt-5">
+    <!-- /.row -->
+    <div class="row justify-content-md-center">
+
+        <div class="col-md-8">
+
+            <!-- /.card -->
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <h5 class="m-0" th:text="${title}">Title</h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text" th:text="${message}"></p>
+
+                    <a th:unless="${#strings.equals(title,'Registration process - Expired link')}" href="/"
+                       class="btn btn-sm btn-info"><i class="fa fa-home" aria-hidden="true"></i></a>
+
+                    <a href="/login"
+                       th:if="${#strings.equals(title,'Registration process - Success') || #strings.equals(title,'Registration process - Email already verified')}"
+                       class="btn btn-sm btn-info">Sign in</a>
+
+                    <div th:if="${#strings.equals(title,'Registration process - Expired link')}">
+                        <form action="#" th:action="@{/resend-token}" th:object="${emailDto}" method="post">
+                            <input type="hidden" name="email" th:field="*{email}"/>
+                            <a href="/" class="btn btn-sm btn-info"><i class="fa fa-home"></i></a>
+                            <button class="btn btn-sm btn-info" type="submit">
+                                <i class="fa fa-envelope mr-1" aria-hidden="true"></i>resend link
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- /.card -->
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

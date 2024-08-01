@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{user/template :: head(title = 'Blog')}"></head>
+<body class="hold-transition sidebar-mini layout-fixed">
+<div class="wrapper">
+
+    <!-- Main Sidebar Container -->
+    <th:block th:replace="~{user/template :: sidebar(${profile})}"></th:block>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+
+        <!-- Main content -->
+        <section class="content mt-3">
+            <div class="container-fluid">
+                <!-- /.row -->
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <div th:if="${message != null}" class="alert alert-success text-center" role="alert">
+                            <i class="bi bi-exclamation-triangle"></i> <span th:text="${message.content}">Author created successfully!</span>
+                        </div>
+                        <!-- Widget: user widget style 2 -->
+                        <div class="card card-widget widget-user-2">
+                            <!-- Add the bg color to the header using any of the bg-* classes -->
+                            <div class="widget-user-header bg-info">
+                                <div class="widget-user-image">
+                                    <img class="img-circle elevation-2" th:src="${author.avatarUrl}" alt="User Avatar">
+                                </div>
+                                <!-- /.widget-user-image -->
+                                <h3 th:text="${author.fullName}" class="widget-user-username">Nadia Carmichael</h3>
+
+                                <h5 th:text="${author.role}" class="widget-user-desc"></h5>
+                            </div>
+                            <div class="card-body p-0">
+                                <table class="table table-sm mb-0">
+                                    <tbody>
+                                    <tr>
+                                        <td>first name</td>
+                                        <td th:text="${author.firstName}"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>last name</td>
+                                        <td th:text="${author.lastName}"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>username</td>
+                                        <td th:text="${author.username}"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>email</td>
+                                        <td th:text="${author.email}"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>bio</td>
+                                        <td th:text="${author.bio}"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>created</td>
+                                        <td th:text="${#temporals.format(author.created, 'yyyy/MM/dd, HH:mm:ss')}"></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="width: 125px">last modified</td>
+                                        <td th:text="${#temporals.format(author.modified, 'yyyy/MM/dd, HH:mm:ss')}"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>status</td>
+                                        <td>
+                                            <span th:text="${author.enabled} ? 'Active' : 'Inactive'"></span>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>subscribers</td>
+                                        <td th:text="${author.subscriberCount}"></td>
+                                    </tr>
+                                    <tr>
+                                        <td>comments</td>
+                                        <td th:text="${author.commentCount}"></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="card-footer">
+                                <div class="flex-container">
+                                    <th:block
+                                            th:unless="${author.role.toString() eq 'ADMIN' }">
+                                        <form th:if="${author.enabled}"
+                                              th:action="@{/admin/author/{userId}/disable(userId=${author.id})}"
+                                              method="post">
+                                            <button class="btn btn-sm btn-info mr-2" type="submit">Inactive</button>
+                                        </form>
+                                        <form th:unless="${author.enabled}"
+                                              th:action="@{/admin/author/{userId}/enable(userId=${author.id})}"
+                                              method="post">
+                                            <button class="btn btn-sm btn-info mr-2" type="submit">Active</button>
+                                        </form>
+                                    </th:block>
+                                    <a th:href="@{/admin/author/{updatedUserId}/update (updatedUserId = ${author.id})}"
+                                       class="btn btn-sm btn-info mr-2">
+                                        Update
+                                    </a>
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <!-- /.widget-user -->
+                    </div>
+                    <!-- /.col -->
+                </div>
+
+                <div class="row">
+
+                    <div class="col-md-6">
+                        <th:block th:unless="${author.role.toString() eq 'ADMIN'}">
+                        <form th:object="${form}" th:action="@{/admin/author/{id}/permissions/update (id=${author.id})}"
+                              method="post">
+                            <div class="card">
+                                <div class="card-header bg-info">
+                                    <h3 class="card-title">Permissions</h3>
+                                </div>
+                                <!-- /.card-header -->
+                                <div class="card-body p-0">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                        <tr class="text-center">
+                                            <th>Action</th>
+                                            <th>Article</th>
+                                            <th>Comment</th>
+                                            <th>Message</th>
+                                            <th>User</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr th:each="perm : ${displayPermissions}" class="text-center">
+                                            <td th:text="${perm.action}"></td>
+                                            <td>
+                                                <div th:if="${perm.articlePermission.permission != null}"
+                                                     class="icheck-info d-inline">
+                                                    <input type="checkbox"
+                                                           th:id="'checkbox-' + ${perm.articlePermission.permission?.id}"
+                                                           th:checked="${perm.articlePermission.hasPermission}"
+                                                           th:disabled="${#lists.contains(noUserPermissions, perm.articlePermission.permission)}"
+                                                           th:field="*{permissions}"
+                                                           th:value="${perm.articlePermission.permission?.id}"/>
+                                                    <label th:for="'checkbox-' + ${perm.articlePermission.permission?.id}"></label>
+                                                </div>
+
+                                            </td>
+                                            <td>
+                                                <div th:if="${perm.commentPermission.permission != null}"
+                                                     class="icheck-info d-inline">
+                                                    <input type="checkbox"
+                                                           th:id="'checkbox-' + ${perm.commentPermission.permission?.id}"
+                                                           th:checked="${perm.commentPermission.hasPermission}"
+                                                           th:disabled="${#lists.contains(noUserPermissions, perm.commentPermission.permission)}"
+                                                           th:field="*{permissions}"
+                                                           th:value="${perm.commentPermission.permission?.id}"/>
+                                                    <label th:for="'checkbox-' + ${perm.commentPermission.permission?.id}"></label>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div th:if="${perm.messagePermission.permission != null}"
+                                                     class="icheck-info d-inline">
+                                                    <input type="checkbox"
+                                                           th:id="'checkbox-' + ${perm.messagePermission.permission?.id}"
+                                                           th:checked="${perm.messagePermission.hasPermission}"
+                                                           th:disabled="${#lists.contains(noUserPermissions, perm.messagePermission.permission)}"
+                                                           th:field="*{permissions}"
+                                                           th:value="${perm.messagePermission.permission?.id}"/>
+                                                    <label th:for="'checkbox-' + ${perm.messagePermission.permission?.id}"></label>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div th:if="${perm.userPermission.permission != null}"
+                                                     class="icheck-info d-inline">
+                                                    <input type="checkbox"
+                                                           th:id="'checkbox-' + ${perm.userPermission.permission?.id}"
+                                                           th:checked="${perm.userPermission.hasPermission}"
+                                                           th:disabled="${#lists.contains(noUserPermissions, perm.userPermission.permission)}"
+                                                           th:field="*{permissions}"
+                                                           th:value="${perm.userPermission.permission?.id}"/>
+                                                    <label th:for="'checkbox-' + ${perm.userPermission.permission?.id}"></label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                                <!-- /.card-body -->
+                                <div class="card-footer">
+                                    <button type="submit" class="btn btn-info btn-sm">Update Permissions</button>
+                                </div>
+
+                            </div>
+                        </form>
+                        </th:block>
+                    </div>
+                </div>
+
+
+                <!-- /.card -->
+
+            </div>
+            <!-- /.row -->
+
+
+            <!-- /.container-fluid -->
+        </section>
+        <!-- /.content -->
+    </div>
+    <!-- /.content-wrapper -->
+
+    <th:block th:replace="~{user/template :: footer}"></th:block>
+
+    <!-- Control Sidebar -->
+    <aside class="control-sidebar control-sidebar-dark">
+        <!-- Control sidebar content goes here -->
+    </aside>
+    <!-- /.control-sidebar -->
+</div>
+<!-- ./wrapper -->
+<div th:insert="~{user/fragments :: common-scripts}"></div>
+</body>
+</html>
+
