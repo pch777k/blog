@@ -39,9 +39,9 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         String [] whiteList = { "/", "/login", "/signup",
-                "/resend-token", "email/verify", "/password/**",
-                "search", "articles/*", "articles/*/*",
-                "authors/*/articles", "categories/*/articles", "tags/*/articles",
+                "/resend-token", "/email/verify", "/password/**",
+                "/search", "/articles/*", "/articles/*/*",
+                "/authors/*/articles", "/categories/*/articles", "/tags/*/articles",
                 "/css/**", "/js/**", "/img/**", "/plugins/**", "/error/**"};
 
         http
