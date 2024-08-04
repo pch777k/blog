@@ -44,9 +44,13 @@ public class SecurityConfiguration {
                 "/authors/*/articles", "/categories/*/articles", "/tags/*/articles",
                 "/css/**", "/js/**", "/img/**", "/plugins/**", "/error/**"};
 
+        String [] whiteApiList = { "/api/v1/auth/signup",
+                "/api/v1/auth/resend-token", "/api/v1/auth/email/verify", "/api/v1/auth/password/**"};
+
         http
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(whiteList).permitAll()
+                        .requestMatchers(whiteApiList).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/author/**").hasAnyRole("ADMIN", "AUTHOR")
                         .requestMatchers("/reader/**").hasAnyRole("READER")

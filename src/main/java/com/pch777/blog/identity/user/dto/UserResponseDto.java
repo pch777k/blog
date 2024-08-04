@@ -5,12 +5,14 @@ import com.pch777.blog.identity.user.domain.model.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.UUID;
 
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 public class UserResponseDto {
 
     private UUID id;
