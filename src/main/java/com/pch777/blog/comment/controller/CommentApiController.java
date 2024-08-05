@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -15,6 +16,8 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.net.URI;
 import java.security.Principal;
 import java.util.UUID;
+
+import static org.springframework.web.servlet.function.RequestPredicates.contentType;
 
 @RequiredArgsConstructor
 @RestController
@@ -27,13 +30,6 @@ public class CommentApiController {
     ResponseEntity<Page<Comment>> getComments(@PathVariable("article-id") UUID articleId, Pageable pageable) {
         Page<Comment> pageComments = commentService.getCommentsByArticleId(articleId, pageable);
         return ResponseEntity.ok(pageComments);
-    }
-
-    @GetMapping("{comment-id}")
-    ResponseEntity<Comment> getComment(@PathVariable("article-id") UUID articleId,
-                       @PathVariable("comment-id") UUID commentId) {
-        Comment comment = commentService.getCommentById(commentId);
-        return ResponseEntity.ok(comment);
     }
 
     @PostMapping
@@ -56,7 +52,11 @@ public class CommentApiController {
                                                  @Valid @RequestBody CommentDto commentDto,
                                                  Principal principal) {
         Comment updatedComment = commentService.updateComment(commentId, commentDto, principal.getName());
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(updatedComment);
+
+        return ResponseEntity
+                .status(HttpStatus.ACCEPTED)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(updatedComment);
     }
 
     @DeleteMapping("{comment-id}")
