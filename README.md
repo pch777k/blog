@@ -1,6 +1,6 @@
 # Blog
 Blog app created with Spring Boot.
-[![Blog presentation](https://i.postimg.cc/W4r4wNJV/blog-scan.png)](https://vimeo.com/1008883017 "Blog presentation - Click to watch!")
+[![Blog presentation](https://i.postimg.cc/g2FNJRVb/blog-scan-v2.png)](https://vimeo.com/1008883017 "Blog presentation - Click to watch!")
 
 ## Table of contents
 - [Blog](#blog)
